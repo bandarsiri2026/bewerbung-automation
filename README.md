@@ -72,40 +72,40 @@ Canvas view of the active pipeline (24 nodes):
 ### Workflow A — `Bewerbung My` (24 nodes)
 ```mermaid
 flowchart LR
-  TG[Telegram Trigger] --> PARSE[Parse Telegram Message<br/>JS: keyword + URL + e-mail regex]
-  TG -.-> PROFILE[Applicant Profile<br/>name, address, phone, e-mail from env vars]
-  PARSE --> ISAPPLY{Is /apply command?}
-  ISAPPLY -- true --> ROUTE{Route by URL Type}
-  ISAPPLY -- false --> UNKNOWN[Unknown Command Reply]
-  ROUTE -- contains arbeitsagentur.de --> MSG[Send Processing Message]
-  ROUTE -- otherwise --> NORM[Normalize Job Text Input]
-  MSG --> FETCH[Fetch Job Page<br/>Arbeitsagentur REST API]
-  FETCH --> EXTRACT[Analyze Job Posting - OpenAI]
-  EXTRACT --> ENRICH[Parse & Enrich Job Data]
-  NORM --> EXTRACT2[Analyze Job Text - OpenAI]
-  EXTRACT2 --> ENRICH2[Parse & Enrich Job Data (Text)]
-  ENRICH --> MERGE[Merge Job Data]
+  TG["Telegram Trigger"] --> PARSE["Parse Telegram Message<br/>JS: keyword, URL and e-mail regex"]
+  TG -.-> PROFILE["Applicant Profile<br/>name, address, phone, e-mail from env vars"]
+  PARSE --> ISAPPLY{"apply command?"}
+  ISAPPLY -- yes --> ROUTE{"URL type"}
+  ISAPPLY -- no --> UNKNOWN["Unknown Command Reply"]
+  ROUTE -- "arbeitsagentur.de" --> MSG["Send Processing Message"]
+  ROUTE -- otherwise --> NORM["Normalize Job Text Input"]
+  MSG --> FETCH["Fetch Job Page<br/>Arbeitsagentur REST API"]
+  FETCH --> EXTRACT["Analyze Job Posting - OpenAI"]
+  EXTRACT --> ENRICH["Parse and Enrich Job Data"]
+  NORM --> EXTRACT2["Analyze Job Text - OpenAI"]
+  EXTRACT2 --> ENRICH2["Parse and Enrich Job Data, text branch"]
+  ENRICH --> MERGE["Merge Job Data"]
   ENRICH2 --> MERGE
-  MERGE --> COVER[Generate Cover Letter - OpenAI]
-  COVER --> PREP[Prepare Email & Summary]
+  MERGE --> COVER["Generate Cover Letter - OpenAI"]
+  COVER --> PREP["Prepare Email and Summary"]
   PROFILE -.-> PREP
-  PREP --> PDF[Generate Anschreiben PDF<br/>PDF bytes built in JS, multi-page]
+  PREP --> PDF["Generate Anschreiben PDF<br/>PDF bytes built in JS, multi-page"]
   PROFILE -.-> PDF
-  PDF --> DRIVE[Upload Anschreiben to Drive]
-  DRIVE --> CV[Get Lebenslauf]
-  CV --> DIPLOMA[Get Master Diplom]
-  DIPLOMA --> ANSCHREIBEN[Get Anschreiben from Drive]
-  ANSCHREIBEN --> DRAFT[Create Gmail Draft<br/>3 attachments]
-  DRAFT --> SHEET[Log to Google Sheets]
-  SHEET --> SUCCESS[Send Success Summary to Telegram]
+  PDF --> DRIVE["Upload Anschreiben to Drive"]
+  DRIVE --> CV["Get Lebenslauf"]
+  CV --> DIPLOMA["Get Master Diplom"]
+  DIPLOMA --> ANSCHREIBEN["Get Anschreiben from Drive"]
+  ANSCHREIBEN --> DRAFT["Create Gmail Draft<br/>3 attachments"]
+  DRAFT --> SHEET["Log to Google Sheets"]
+  SHEET --> SUCCESS["Send Success Summary to Telegram"]
 ```
 
 ### Error handler — `Workflow Error Handler` (3 nodes)
 
 ```mermaid
 flowchart LR
-  ET[Error Trigger] --> SUM[Summarize Error<br/>workflow, node, message, timestamp]
-  SUM --> TG[Notify on Telegram]
+  ET["Error Trigger"] --> SUM["Summarize Error<br/>workflow, node, message, timestamp"]
+  SUM --> TG2["Notify on Telegram"]
 ```
 
 ## 4. Technologies and integrations
@@ -253,7 +253,8 @@ bewerbung-automation/
 │   └── error-handler.sanitized.json         (Error Trigger → Telegram notification)
 ├── scripts/
 │   ├── pdf_test.js                          (standalone test for the PDF generator)
-│   └── validate_workflows.py                (secret + connection sanity check, used by CI)
+│   ├── validate_workflows.py                (secret + connection sanity check, used by CI)
+│   └── check_diagrams.py                    (Mermaid lint so GitHub renders the diagrams)
 ├── .github/workflows/validate.yml           (CI: runs both checks on every push)
 ├── CHANGELOG.md
 ├── docs/

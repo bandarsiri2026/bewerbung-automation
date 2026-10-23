@@ -13,6 +13,9 @@ jobs:
       - name: Check workflow JSON for secrets and broken connections
         run: python3 scripts/validate_workflows.py
 
+      - name: Lint Mermaid diagrams in the docs
+        run: python3 scripts/check_diagrams.py README.md docs/*.md
+
       - name: Test the PDF generator (multi-page layout)
         run: |
           node --version

@@ -34,6 +34,10 @@ All notable changes to this repository are recorded here.
 - README §1 now quantifies the before/after (30–60 minutes manual vs seconds automated)
   with a step-by-step table and the project's motivation.
 - `docs/linkedin-post.md` — ready-to-publish announcement of the project.
+- **Fixed the Mermaid diagram** that GitHub could not render (`Parse error … got 'PS'`):
+  node labels containing parentheses are now quoted, e.g. `ENRICH2["Parse and Enrich Job Data"]`.
+- `scripts/check_diagrams.py` — lint that fails CI when a Mermaid label uses unquoted
+  parentheses; validated against the real Mermaid parser (v12).
 
 ## v1.0.0 — initial public release (2026-10-23)
 
