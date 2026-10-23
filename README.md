@@ -187,7 +187,7 @@ Remaining improvement: validate extracted job data before generating documents (
 ## 11. Hardening already applied vs. still planned
 
 **Implemented in this repository**
-- `retryOnFail` / `maxTries: 3` / `waitBetweenRetries: 2` on all HTTP nodes (job API and the three OpenAI calls).
+- `retryOnFail` / `maxTries: 3` / `waitBetweenRetries: 2` on every network node (job API, the three OpenAI calls, Drive, Sheets, Gmail and Telegram sends).
 - Multi-page PDF generation instead of the original single-page truncation, plus a standalone Node.js test harness (`scripts/pdf_test.js`) that renders `docs/sample-anschreiben.pdf` outside n8n.
 - A companion **Error Handler** workflow (`workflows/error-handler.sanitized.json`: Error Trigger → Code summary → Telegram notification).
 - Applicant profile moved into its own `Applicant Profile` node instead of hard-coded strings inside the PDF code.
@@ -226,7 +226,6 @@ bewerbung-automation/
 ├── PROJECT_ANALYSIS_AR.md        (detailed Arabic technical analysis, node by node)
 ├── workflows/
 │   ├── bewerbung-my.sanitized.json          (main pipeline, 24 nodes)
-│   ├── answer-from-vector-v2.sanitized.json (experimental RAG assistant, 25 nodes)
 │   └── error-handler.sanitized.json         (Error Trigger → Telegram notification)
 ├── scripts/
 │   ├── pdf_test.js                          (standalone test for the PDF generator)
