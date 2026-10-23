@@ -81,14 +81,16 @@ Both screenshots show only the canvas layout (node names and connections). No cr
 
 ## 3. Sanitized copy created
 
-Sanitized copies were created **without touching the originals**: published here as `workflows/bewerbung-my.sanitized.json` and `workflows/answer-from-vector-v2.sanitized.json`. They:
+A sanitized copy was created **without touching the original**: published here as `workflows/bewerbung-my.sanitized.json`. It:
 - replace the three plaintext OpenAI keys with `Bearer {{ $env.OPENAI_API_KEY }}`,
 - empty `pinData` (the original contained a real third-party Telegram message),
 - replace personal name/address/phone/e-mail literals with `<APPLICANT_NAME>`, `<APPLICANT_ADDRESS>`, `<APPLICANT_PHONE>`, `<YOUR_EMAIL>`, `<FALLBACK_EMAIL>`,
 - replace Google Sheets / Drive resource IDs with `=<REPLACE_WITH_SHEET_ID>`, `=<REPLACE_WITH_DRIVE_FOLDER_ID>`, `=<REPLACE_WITH_FILE_ID>` and drop the cached result URLs,
 - regenerate every `webhookId` so the published file carries no instance fingerprint.
 
-Both files are valid JSON, keep the original connection graph (24 nodes in workflow A after hardening, 25 in workflow B) and can be imported into n8n for testing after you attach your own credentials. Two minor residues remain by design: the city string `'Ulm, den '` in the PDF date line (change it to a config value if you want full neutrality) and generic file names such as `Lebenslauf.pdf`.
+The file is valid JSON, keeps the original connection graph (24 nodes after hardening) and can be imported into n8n for testing after you attach your own credentials. Two minor residues remain by design: the city string `'Ulm, den '` in the PDF date line (change it to a config value if you want full neutrality) and generic file names such as `Lebenslauf.pdf`.
+
+The second workflow (`Answer from vector v2`) was sanitised with the same rules and published in its own repository.
 
 ### Hardening applied after the audit
 

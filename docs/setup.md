@@ -2,11 +2,12 @@
 
 ## 1. Import the workflows
 
-1. In n8n: **Workflows → Import from file** and pick one of:
+1. In n8n: **Workflows → Import from file** and pick:
    - `workflows/bewerbung-my.sanitized.json` — Telegram → job ad → Anschreiben PDF → Gmail draft
-   - `workflows/answer-from-vector-v2.sanitized.json` — RAG / Supabase ingestion + agent answering (experimental, inactive)
-   - `workflows/error-handler.sanitized.json` — shared error handler for the other two
+   - `workflows/error-handler.sanitized.json` — shared error handler for the pipeline
 2. The sanitized files contain **no** API keys, no personal data and only generic resource IDs.
+
+> The second workflow from the original project (`Answer from vector v2`, a multimodal RAG assistant) is published in its own repository: [answer-from-vector-v2](https://github.com/bandarsiri2026/answer-from-vector-v2).
 
 ## 1b. Wire up the error handler
 
@@ -52,7 +53,7 @@ Both commands run in GitHub Actions on every push (`.github/workflows/validate.y
 - OpenAI calls are raw HTTP requests rather than n8n's built-in OpenAI nodes — move them to credentials for cleaner auth.
 - No input validation node: incomplete extraction still produces a document ("Unknown Company").
 - No scheduled trigger: the pipeline only runs when someone messages the bot.
-- Workflow B is inactive and has three disabled nodes; its ingestion branch must be run manually.
+- The RAG workflow (`Answer from vector v2`) is not part of this repository; it has three disabled nodes and an ingestion branch that must be run manually — see its own repo for details.
 
 ---
 
