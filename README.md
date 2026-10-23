@@ -215,7 +215,8 @@ This project was developed with AI assistance. The workflow structure and severa
 
 ## 13. License
 
-Add a license before publishing (e.g. MIT) if you want others to reuse it.
+This project is released under the **MIT License** (see `LICENSE`).
+
 
 ## 14. Suggested repository structure
 
