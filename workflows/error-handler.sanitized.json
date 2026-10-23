@@ -1,0 +1,77 @@
+{
+  "name": "Workflow Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e1000000-0000-4000-8000-000000000001",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst wf = item.workflow || {};\nconst err = item.error || {};\n\nreturn [{\n  json: {\n    workflow: wf.name || 'unknown workflow',\n    failed_node: err.node ? err.node.name : 'unknown node',\n    error_message: err.message || 'Unknown error',\n    timestamp: new Date().toISOString(),\n    error_summary: 'Workflow \"' + (wf.name || 'unknown') + '\" failed at node \"' + (err.node ? err.node.name : 'unknown') + '\": ' + (err.message || 'Unknown error'),\n  }\n}];"
+      },
+      "id": "e1000000-0000-4000-8000-000000000002",
+      "name": "Summarize Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "<REPLACE_WITH_TELEGRAM_CHAT_ID>",
+        "text": "={{ $json.error_summary }}"
+      },
+      "id": "e1000000-0000-4000-8000-000000000003",
+      "name": "Notify on Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        680,
+        300
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenRetries": 2
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Summarize Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize Error": {
+      "main": [
+        [
+          {
+            "node": "Notify on Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "sanitized-error-handler",
+  "meta": {
+    "instanceId": "REPLACE_WITH_INSTANCE_ID"
+  },
+  "tags": []
+}

@@ -1,6 +1,6 @@
 # Security Audit — n8n Workflow Export (pre-publication review)
 
-**Files audited:** `Answer from vector v2.json`, `Bewerbung My (2).json` and the two canvas screenshots.
+**Files audited:** `Bewerbung My (2).json` and its canvas screenshot. The companion RAG workflow (`Answer from vector v2`) was audited separately in [answer-from-vector-v2](https://github.com/bandarsiri2026/answer-from-vector-v2).
 **Method:** static inspection of the exported JSON only. No workflow was executed, no external service was contacted, and **the original files were not modified**. Secret values are described below but never reproduced in this report.
 
 ## 1. Executive summary
@@ -57,7 +57,7 @@ When no contact e-mail is extracted, the Code node falls back to a fixed address
 **Action:** make the fallback explicit in documentation, or stop the workflow and send a warning message to Telegram instead of guessing a recipient.
 
 ### Finding 5 — Internal identifiers (Medium/Low)
-The export contains two Google Sheets document IDs, three Google Drive file IDs plus one folder ID, a Supabase table name (`documents`), Postgres/Supabase credential references, and five n8n `webhookId` UUIDs per workflow.
+The export contains two Google Sheets document IDs, three Google Drive file IDs plus one folder ID, and five n8n `webhookId` UUIDs.
 
 **Risk:** these are not secrets in the cryptographic sense, but they identify private resources. A Sheets/Drive document that is "anyone with the link can view" becomes directly accessible to anyone reading the repo.
 
@@ -81,14 +81,14 @@ Both screenshots show only the canvas layout (node names and connections). No cr
 
 ## 3. Sanitized copy created
 
-Two sanitized copies were created **without touching the originals**: `Bewerbung My (2).sanitized.json` and `Answer from vector v2.sanitized.json`. Both:
+A sanitized copy was created **without touching the original**: published here as `workflows/bewerbung-my.sanitized.json`. It:
 - replace the three plaintext OpenAI keys with `Bearer {{ $env.OPENAI_API_KEY }}`,
 - empty `pinData` (the original contained a real third-party Telegram message),
 - replace personal name/address/phone/e-mail literals with `<APPLICANT_NAME>`, `<APPLICANT_ADDRESS>`, `<APPLICANT_PHONE>`, `<YOUR_EMAIL>`, `<FALLBACK_EMAIL>`,
 - replace Google Sheets / Drive resource IDs with `=<REPLACE_WITH_SHEET_ID>`, `=<REPLACE_WITH_DRIVE_FOLDER_ID>`, `=<REPLACE_WITH_FILE_ID>` and drop the cached result URLs,
 - regenerate every `webhookId` so the published file carries no instance fingerprint.
 
-Both files are valid JSON, keep all 23 / 25 nodes and the original connection graph, and can be imported into n8n for testing after you attach your own credentials. Two minor residues remain by design: the city string `'Ulm, den '` in the PDF date line (change it to a config value if you want full neutrality) and generic file names such as `Lebenslauf.pdf`.
+The file is valid JSON, keeps all 24 nodes and the original connection graph, and can be imported into n8n for testing after you attach your own credentials. Two minor residues remain by design: the city string `'Ulm, den '` in the PDF date line (change it to a config value if you want full neutrality) and generic file names such as `Lebenslauf.pdf`.
 
 ## 4. Pre-publication checklist
 

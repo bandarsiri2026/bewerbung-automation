@@ -26,7 +26,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const msg = $input.first().json;\nconst text = msg.message?.text || '';\nconst chatId = msg.message?.chat?.id;\nconst messageId = msg.message?.message_id;\nconst isApply = text.toLowerCase().startsWith('apply');\nconst isYes = text.toLowerCase() === 'yes' || text === '\\u2705';\nconst isNo = text.toLowerCase() === 'no' || text === '\\u274c';\n\nlet jobUrl = '';\nlet jobText = '';\nlet manualEmail = '';\nlet refnr = '';\n\nif (isApply) {\n  const afterApply = text.replace(/^apply\\s*/i, '');\n\n  // FIX: extract proper email from the full pasted text (handles multiline paste with email buried in it)\n  const emailMatch = afterApply.match(/[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}/);\n  if (emailMatch) {\n    manualEmail = emailMatch[0];\n  }\n\n  // First non-empty token: if it starts with http it's a URL, otherwise treat everything as job text\n  const firstToken = (afterApply.trim().split(/\\s+/)[0]) || '';\n  if (firstToken.startsWith('http')) {\n    jobUrl = firstToken;\n  } else {\n    jobText = afterApply.trim();\n  }\n}\n\nif (jobUrl.includes('arbeitsagentur.de')) {\n  const detailMatch = jobUrl.match(/jobdetail\\/([A-Za-z0-9_-]+)/);\n  const idMatch = jobUrl.match(/[?&]id=([A-Za-z0-9_-]+)/);\n  if (detailMatch) refnr = detailMatch[1];\n  else if (idMatch) refnr = idMatch[1];\n}\n\nreturn [{\n  json: {\n    chat_id: chatId,\n    message_id: messageId,\n    raw_text: text,\n    is_apply: isApply,\n    is_yes: isYes,\n    is_no: isNo,\n    job_url: jobUrl,\n    job_text: jobText,\n    manual_email: manualEmail,\n    refnr: refnr,\n    refnr_b64: Buffer.from(refnr || '').toString('base64')\n  }\n}];"
+        "jsCode": "const msg = $input.first().json;\nconst text = msg.message?.text || '';\nconst chatId = msg.message?.chat?.id;\nconst messageId = msg.message?.message_id;\nconst isApply = text.toLowerCase().startsWith('apply');\n\nlet jobUrl = '';\nlet jobText = '';\nlet manualEmail = '';\nlet refnr = '';\n\nif (isApply) {\n  const afterApply = text.replace(/^apply\\s*/i, '');\n\n  // FIX: extract proper email from the full pasted text (handles multiline paste with email buried in it)\n  const emailMatch = afterApply.match(/[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}/);\n  if (emailMatch) {\n    manualEmail = emailMatch[0];\n  }\n\n  // First non-empty token: if it starts with http it's a URL, otherwise treat everything as job text\n  const firstToken = (afterApply.trim().split(/\\s+/)[0]) || '';\n  if (firstToken.startsWith('http')) {\n    jobUrl = firstToken;\n  } else {\n    jobText = afterApply.trim();\n  }\n}\n\nif (jobUrl.includes('arbeitsagentur.de')) {\n  const detailMatch = jobUrl.match(/jobdetail\\/([A-Za-z0-9_-]+)/);\n  const idMatch = jobUrl.match(/[?&]id=([A-Za-z0-9_-]+)/);\n  if (detailMatch) refnr = detailMatch[1];\n  else if (idMatch) refnr = idMatch[1];\n}\n\nreturn [{\n  json: {\n    chat_id: chatId,\n    message_id: messageId,\n    raw_text: text,\n    is_apply: isApply,\n    job_url: jobUrl,\n    job_text: jobText,\n    manual_email: manualEmail,\n    refnr: refnr,\n    refnr_b64: Buffer.from(refnr || '').toString('base64')\n  }\n}];"
       },
       "id": "7b8167eb-874f-4bdc-8698-2001abb367a9",
       "name": "Parse Telegram Message",
@@ -125,7 +125,10 @@
           "id": "h5qQ884sXj854jSv",
           "name": "Bewerbung"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenRetries": 2
     },
     {
       "parameters": {
@@ -156,7 +159,10 @@
       "position": [
         1120,
         0
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenRetries": 2
     },
     {
       "parameters": {
@@ -195,7 +201,10 @@
           "id": "y2n3Vx7MRKjSfoge",
           "name": "Bearer Auth account"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenRetries": 2
     },
     {
       "parameters": {
@@ -271,7 +280,10 @@
           "id": "y2n3Vx7MRKjSfoge",
           "name": "Bearer Auth account"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenRetries": 2
     },
     {
       "parameters": {
@@ -308,7 +320,10 @@
           "id": "h5qQ884sXj854jSv",
           "name": "Bewerbung"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenRetries": 2
     },
     {
       "parameters": {
@@ -347,11 +362,14 @@
           "id": "y2n3Vx7MRKjSfoge",
           "name": "Bearer Auth account"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenRetries": 2
     },
     {
       "parameters": {
-        "jsCode": "const coverLetter = $input.first().json.choices[0].message.content;\nconst job = $('Merge Job Data').first().json;\nconst today = new Date().toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' });\nconst hiringManager = job.hiring_manager || '';\n\nconst firstLine = coverLetter.split('\\n').find(l => l.trim().startsWith('Sehr geehrte'));\nconst greeting = firstLine ? firstLine.trim() : 'Sehr geehrte Damen und Herren,';\n\nconst emailBody = greeting + '\\n\\nanbei sende ich Ihnen meine Bewerbungsunterlagen.\\n\\nÜber eine Einladung zu einem Vorstellungsgespräch würde ich mich sehr freuen.\\n\\nMit freundlichen Grüßen\\n<APPLICANT_NAME>';\nconst subject = 'Bewerbung als ' + job.job_title + ' – <APPLICANT_NAME>';\n\n// Priority: manual_email (cleaned by Parse node) → regex/GPT contact_email → own email as fallback\nconst rawEmail = $('Parse Telegram Message').first().json.manual_email || job.contact_email || '';\nconst toEmail = rawEmail.trim() !== '' ? rawEmail.trim() : '<FALLBACK_EMAIL>';\n\nreturn [{\n  json: {\n    cover_letter: coverLetter,\n    email_subject: subject,\n    email_body: emailBody,\n    greeting: greeting,\n    to_email: toEmail,\n    company_name: job.company_name,\n    job_title: job.job_title,\n    location: job.location || '',\n    hiring_manager: hiringManager,\n    company_address: job.company_address || '',\n    job_url: job.job_url,\n    date_applied: today,\n    applicant_email: job.applicant_email,\n    applicant_name: job.applicant_name,\n    chat_id: job.chat_id\n  }\n}];"
+        "jsCode": "const coverLetter = $input.first().json.choices[0].message.content;\nconst profile = $('Applicant Profile').first().json;\nconst job = $('Merge Job Data').first().json;\nconst today = new Date().toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' });\nconst hiringManager = job.hiring_manager || '';\n\nconst firstLine = coverLetter.split('\\n').find(l => l.trim().startsWith('Sehr geehrte'));\nconst greeting = firstLine ? firstLine.trim() : 'Sehr geehrte Damen und Herren,';\n\nconst emailBody = greeting + '\\n\\nanbei sende ich Ihnen meine Bewerbungsunterlagen.\\n\\nÜber eine Einladung zu einem Vorstellungsgespräch würde ich mich sehr freuen.\\n\\nMit freundlichen Grüßen\\n<APPLICANT_NAME>'.replace('<APPLICANT_NAME>', profile.applicant_name);\nconst subject = 'Bewerbung als ' + job.job_title + ' – <APPLICANT_NAME>'.replace('<APPLICANT_NAME>', profile.applicant_name);\n\n// Priority: manual_email (cleaned by Parse node) → regex/GPT contact_email → own email as fallback\nconst rawEmail = $('Parse Telegram Message').first().json.manual_email || job.contact_email || '';\nconst toEmail = rawEmail.trim() !== '' ? rawEmail.trim() : profile.fallback_email;\n\nreturn [{\n  json: {\n    cover_letter: coverLetter,\n    email_subject: subject,\n    email_body: emailBody,\n    greeting: greeting,\n    to_email: toEmail,\n    company_name: job.company_name,\n    job_title: job.job_title,\n    location: job.location || '',\n    hiring_manager: hiringManager,\n    company_address: job.company_address || '',\n    job_url: job.job_url,\n    date_applied: today,\n    applicant_email: job.applicant_email,\n    applicant_name: job.applicant_name,\n    chat_id: job.chat_id\n  }\n}];"
       },
       "id": "ce5c9fd4-1086-4df9-a8d4-8659939281bf",
       "name": "Prepare Email & Summary",
@@ -364,7 +382,7 @@
     },
     {
       "parameters": {
-        "jsCode": "\nconst data = $('Prepare Email & Summary').first().json;\n\nconst WIN1252 = {\n  '\\u00e4':228,'\\u00f6':246,'\\u00fc':252,\n  '\\u00c4':196,'\\u00d6':214,'\\u00dc':220,\n  '\\u00df':223,'\\u00e9':233,'\\u00e8':232,\n  '\\u00e0':224,'\\u00e2':226,'\\u00ea':234,\n  '\\u00fb':251,'\\u00ee':238,'\\u00ef':239,\n  '\\u2013':150,'\\u2014':151,\n  '\\u2019':146,'\\u201c':147,'\\u201d':148,\n};\n\nfunction escPdf(str) {\n  let r = '';\n  for (const ch of String(str)) {\n    if (WIN1252[ch] !== undefined) {\n      r += '\\\\' + WIN1252[ch].toString(8).padStart(3,'0');\n    } else if (ch === '\\\\') { r += '\\\\\\\\';\n    } else if (ch === '(')  { r += '\\\\(';\n    } else if (ch === ')')  { r += '\\\\)';\n    } else {\n      const c = ch.charCodeAt(0);\n      r += (c >= 32 && c <= 126) ? ch : '?';\n    }\n  }\n  return r;\n}\n\nfunction wrap(text, max) {\n  const words = String(text).split(' ');\n  const lines = []; let cur = '';\n  for (const w of words) {\n    const t = cur ? cur + ' ' + w : w;\n    if (t.length > max && cur) { lines.push(cur); cur = w; }\n    else cur = t;\n  }\n  if (cur) lines.push(cur);\n  return lines.length ? lines : [''];\n}\n\nconst PW=595.28, PH=841.89, ML=70.8, MR=524.4, FS=11, LH=16, LSM=14, MAX=80;\nconst ops = []; let y = 800;\n\nfunction T(x,yy,str,font,size) {\n  const s = escPdf(str);\n  if(s) ops.push(`BT /${font} ${size} Tf ${x.toFixed(1)} ${yy.toFixed(1)} Td (${s}) Tj ET`);\n}\nfunction TR(str,yy,font,size) {\n  T(MR - str.length*size*0.52, yy, str, font, size);\n}\n\nT(ML,y,'<APPLICANT_NAME>','FB',FS); y-=LSM;\nT(ML,y,'<APPLICANT_ADDRESS>','F',FS); y-=LSM;\nT(ML,y,'Mobil: <APPLICANT_PHONE>  E-Mail: <YOUR_EMAIL>','F',FS); y-=22;\n\nconst topY=y;\nfor(const l of [data.company_name,data.hiring_manager,data.company_address,data.location].filter(Boolean)){\n  T(ML,y,l,'F',FS); y-=LSM;\n}\nTR('Ulm, den '+data.date_applied, topY,'F',FS); y-=14;\n\nfor(const l of wrap('Bewerbung als '+data.job_title, MAX)){ T(ML,y,l,'FB',FS); y-=LH; }\ny-=8;\n\nfor(const para of data.cover_letter.split(/\\n\\n+/)){\n  if(y<80) break;\n  for(const line of para.trim().split('\\n')){\n    if(y<80) break;\n    if(!line.trim()){y-=6;continue;}\n    for(const wl of wrap(line,MAX)){ if(y<80)break; T(ML,y,wl,'F',FS); y-=LH; }\n  }\n  y-=6;\n}\n\nif(y>80){\n  y-=4;\n  T(ML,y,'Anlagen:','F',FS); y-=LH;\n  T(ML,y,'Lebenslauf','F',FS); y-=LH;\n  T(ML,y,'Zeugnisse','F',FS);\n}\n\nconst stream = ops.join('\\n');\nconst fontDict = '/F << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> '\n               + '/FB << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';\nconst res = `<< /Font << ${fontDict} >> >>`;\n\nfunction toBytes(s) {\n  const a = new Uint8Array(s.length);\n  for(let i=0;i<s.length;i++) a[i]=s.charCodeAt(i)&0xff;\n  return a;\n}\n\nconst parts = [];\nlet offset = 0;\nconst off = {};\n\nfunction addObj(id, content) {\n  const b = toBytes(content);\n  off[id] = offset;\n  parts.push(b);\n  offset += b.length;\n}\n\nconst hdrBytes = toBytes('%PDF-1.4\\n');\nparts.push(hdrBytes); offset += hdrBytes.length;\n\naddObj(1,'1 0 obj\\n<< /Type /Catalog /Pages 2 0 R >>\\nendobj\\n');\naddObj(2,'2 0 obj\\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\\nendobj\\n');\naddObj(3,`3 0 obj\\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PW} ${PH}] /Contents 4 0 R /Resources ${res} >>\\nendobj\\n`);\naddObj(4,`4 0 obj\\n<< /Length ${stream.length} >>\\nstream\\n${stream}\\nendstream\\nendobj\\n`);\n\nconst xrefPos = offset;\nlet xref = 'xref\\n0 5\\n0000000000 65535 f \\n';\nfor(let i=1;i<=4;i++) xref += String(off[i]).padStart(10,'0')+' 00000 n \\n';\nxref += `trailer\\n<< /Size 5 /Root 1 0 R >>\\nstartxref\\n${xrefPos}\\n%%EOF`;\nparts.push(toBytes(xref));\n\nconst total = parts.reduce((s,p)=>s+p.length,0);\nconst allBytes = new Uint8Array(total);\nlet pos=0;\nfor(const p of parts){allBytes.set(p,pos);pos+=p.length;}\n\nconst B64='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';\nlet b64='';\nfor(let i=0;i<allBytes.length;i+=3){\n  const b0=allBytes[i],b1=allBytes[i+1]||0,b2=allBytes[i+2]||0;\n  b64+=B64[b0>>2];\n  b64+=B64[((b0&3)<<4)|(b1>>4)];\n  b64+=i+1<allBytes.length?B64[((b1&15)<<2)|(b2>>6)]:'=';\n  b64+=i+2<allBytes.length?B64[b2&63]:'=';\n}\n\nconst fname='Anschreiben_'+data.job_title.replace(/[\\s\\/\\\\:*?\"<>|]/g,'_').substring(0,60)+'.pdf';\n\nreturn [{\n  json: { ...data, anschreiben_filename: fname },\n  binary: {\n    anschreiben: {\n      data: b64,\n      mimeType: 'application/pdf',\n      fileName: fname,\n      fileExtension: 'pdf'\n    }\n  }\n}];\n"
+        "jsCode": "const data = $('Prepare Email & Summary').first().json;\nconst profile = $('Applicant Profile').first().json;\n\nfunction buildPdf(data, profile) {\n  const WIN1252 = {\n    '\\u00e4':228,'\\u00f6':246,'\\u00fc':252,\n    '\\u00c4':196,'\\u00d6':214,'\\u00dc':220,\n    '\\u00df':223,'\\u00e9':233,'\\u00e8':232,\n    '\\u00e0':224,'\\u00e2':226,'\\u00ea':234,\n    '\\u00fb':251,'\\u00ee':238,'\\u00ef':239,\n    '\\u2013':150,'\\u2014':151,\n    '\\u2019':146,'\\u201c':147,'\\u201d':148,\n  };\n\n  function escPdf(str) {\n    let r = '';\n    for (const ch of String(str)) {\n      if (WIN1252[ch] !== undefined) {\n        r += BS + WIN1252[ch].toString(8).padStart(3, '0');\n      } else if (ch === BS) { r += BS + BS; }\n      else if (ch === '(')  { r += BS + '('; }\n      else if (ch === ')')  { r += BS + ')'; }\n      else {\n        const c = ch.charCodeAt(0);\n        r += (c >= 32 && c <= 126) ? ch : '?';\n      }\n    }\n    return r;\n  }\n\n  const BS = String.fromCharCode(92); // backslash for PDF escapes\n  const NL = String.fromCharCode(10); // real newline for object/xref lines\n\n  function wrap(text, max) {\n    const words = String(text).split(' ');\n    const lines = []; let cur = '';\n    for (const w of words) {\n      const t = cur ? cur + ' ' + w : w;\n      if (t.length > max && cur) { lines.push(cur); cur = w; }\n      else cur = t;\n    }\n    if (cur) lines.push(cur);\n    return lines.length ? lines : [''];\n  }\n\n  const PW = 595.28, PH = 841.89, ML = 70.8, MR = 524.4;\n  const FS = 11, LH = 16, LSM = 14, MAX_CHARS = 80, BOTTOM = 80;\n\n  // ---- page-aware layout ----------------------------------------------------\n  const pages = [];   // one array of content operators per page\n  let ops = [];       // current page operators\n  let y = 800;        // current baseline (PDF origin is bottom-left)\n\n  function newPage() { if (ops.length) pages.push(ops); ops = []; y = 800; }\n  function flushPages() { if (ops.length) pages.push(ops); ops = []; }\n  function ensureRoom(linesNeeded) {\n    if (y - LH * linesNeeded < BOTTOM) newPage();\n  }\n\n  function T(x, yy, str, font, size) {\n    const s = escPdf(str);\n    if (s) ops.push(`BT /${font} ${size} Tf ${x.toFixed(1)} ${yy.toFixed(1)} Td (${s}) Tj ET`);\n  }\n  function TR(str, yy, font, size) {\n    T(MR - str.length * size * 0.52, yy, str, font, size);\n  }\n\n  // Sender block (page 1 only)\n  T(ML, y, profile.name, 'FB', FS); y -= LSM;\n  T(ML, y, profile.address, 'F', FS); y -= LSM;\n  T(ML, y, `Mobil: ${profile.phone}  E-Mail: ${profile.email}`, 'F', FS); y -= 22;\n\n  // Recipient block\n  const topY = y;\n  for (const l of [data.company_name, data.hiring_manager, data.company_address, data.location].filter(Boolean)) {\n    ensureRoom(1);\n    T(ML, y, l, 'F', FS); y -= LSM;\n  }\n  TR('Ulm, den ' + data.date_applied, topY, 'F', FS); y -= 14;\n\n  // Subject line\n  for (const l of wrap('Bewerbung als ' + data.job_title, MAX_CHARS)) {\n    ensureRoom(1);\n    T(ML, y, l, 'FB', FS); y -= LH;\n  }\n  y -= 8;\n\n  // Body paragraphs - page break instead of truncation\n  for (const para of String(data.cover_letter).split(/\\n\\n+/)) {\n    for (const line of para.trim().split('\\n')) {\n      if (!line.trim()) { y -= 6; continue; }\n      for (const wl of wrap(line, MAX_CHARS)) {\n        ensureRoom(1);\n        T(ML, y, wl, 'F', FS); y -= LH;\n      }\n    }\n    y -= 6;\n  }\n\n  // Attachments block\n  if (profile.attachments && profile.attachments.length) {\n    ensureRoom(profile.attachments.length + 1);\n    T(ML, y, 'Anlagen:', 'F', FS); y -= LH;\n    for (const a of profile.attachments) { T(ML, y, a, 'F', FS); y -= LH; }\n  }\n\n  flushPages();\n  // ---- PDF object assembly --------------------------------------------------\n  const fontDict = '/F << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> '\n                 + '/FB << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';\n  const resources = `<< /Font << ${fontDict} >> >>`;\n\n  function toBytes(s) {\n    const a = new Uint8Array(s.length);\n    for (let i = 0; i < s.length; i++) a[i] = s.charCodeAt(i) & 0xff;\n    return a;\n  }\n\n  const parts = [];\n  let offset = 0;\n  const off = {};\n\n  function addObj(id, content) {\n    const b = toBytes(content);\n    off[id] = offset;\n    parts.push(b);\n    offset += b.length;\n  }\n\n  const nPages = pages.length;\n  // ids: 1 catalog, 2 page tree; for page i (0-based): page obj = 3+2i, content obj = 4+2i\n  const kids = [];\n  for (let i = 0; i < nPages; i++) kids.push(`${3 + 2 * i} 0 R`);\n\n  const hdrBytes = toBytes('%PDF-1.4' + NL);\n  parts.push(hdrBytes); offset += hdrBytes.length;\n\n  addObj(1, '1 0 obj' + BS + 'n<< /Type /Catalog /Pages 2 0 R >>' + BS + 'nendobj' + NL);\n  addObj(2, `2 0 obj${NL}<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${nPages} >>${NL}endobj${NL}`);\n\n  for (let i = 0; i < nPages; i++) {\n    const stream = pages[i].join(NL);\n    addObj(3 + 2 * i, `${3 + 2 * i} 0 obj${NL}<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PW} ${PH}] /Contents ${4 + 2 * i} 0 R /Resources ${resources} >>${NL}endobj${NL}`);\n    addObj(4 + 2 * i, `${4 + 2 * i} 0 obj${NL}<< /Length ${stream.length} >>${NL}stream${NL}${stream}${NL}endstream${NL}endobj${NL}`);\n  }\n\n  const totalObjects = 2 + 2 * nPages;\n  const xrefPos = offset;\n  let xref = `xref${NL}0 ${totalObjects + 1}${NL}0000000000 65535 f ${NL}`;\n  for (let i = 1; i <= totalObjects; i++) {\n    xref += String(off[i]).padStart(10, '0') + ' 00000 n ' + NL;\n  }\n  xref += `trailer${NL}<< /Size ${totalObjects + 1} /Root 1 0 R >>${NL}startxref${NL}${xrefPos}${NL}%%EOF`;\n  parts.push(toBytes(xref));\n\n  const total = parts.reduce((s, p) => s + p.length, 0);\n  const allBytes = new Uint8Array(total);\n  let pos = 0;\n  for (const p of parts) { allBytes.set(p, pos); pos += p.length; }\n\n  const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';\n  let b64 = '';\n  for (let i = 0; i < allBytes.length; i += 3) {\n    const b0 = allBytes[i], b1 = allBytes[i + 1] || 0, b2 = allBytes[i + 2] || 0;\n    b64 += B64[b0 >> 2];\n    b64 += B64[((b0 & 3) << 4) | (b1 >> 4)];\n    b64 += i + 1 < allBytes.length ? B64[((b1 & 15) << 2) | (b2 >> 6)] : '=';\n    b64 += i + 2 < allBytes.length ? B64[b2 & 63] : '=';\n  }\n\n  return { base64: b64, pages: nPages };\n}\n\nconst safeTitle = String(data.job_title || 'Anschreiben')\n  .replace(/[^A-Za-z0-9 _-]/g, '_')\n  .substring(0, 60);\nconst fname = 'Anschreiben_' + safeTitle + '.pdf';\nconst out = buildPdf(data, profile);\n\nreturn [{\n  json: { ...data, anschreiben_filename: fname, pdf_pages: out.pages },\n  binary: {\n    anschreiben: {\n      data: out.base64,\n      mimeType: 'application/pdf',\n      fileName: fname,\n      fileExtension: 'pdf'\n    }\n  }\n}];"
       },
       "id": "321c4364-735a-4ee2-bd1b-bd5eac0bf512",
       "name": "Generate Anschreiben PDF",
@@ -407,7 +425,10 @@
           "id": "dfyg9C5cdeBHmFkw",
           "name": "Google Drive account 2"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenRetries": 2
     },
     {
       "parameters": {
@@ -436,7 +457,10 @@
           "id": "dfyg9C5cdeBHmFkw",
           "name": "Google Drive account 2"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenRetries": 2
     },
     {
       "parameters": {
@@ -465,7 +489,10 @@
           "id": "dfyg9C5cdeBHmFkw",
           "name": "Google Drive account 2"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenRetries": 2
     },
     {
       "parameters": {
@@ -493,7 +520,10 @@
           "id": "dfyg9C5cdeBHmFkw",
           "name": "Google Drive account 2"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenRetries": 2
     },
     {
       "parameters": {
@@ -531,7 +561,10 @@
           "id": "PTaiGiu5HubAptTK",
           "name": "Gmail account"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenRetries": 2
     },
     {
       "parameters": {
@@ -631,7 +664,10 @@
           "id": "dzBa8kHB5yUUuXkR",
           "name": "Google Sheets account"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenRetries": 2
     },
     {
       "parameters": {
@@ -655,7 +691,23 @@
           "id": "h5qQ884sXj854jSv",
           "name": "Bewerbung"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenRetries": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "// Single source of truth for the applicant profile.\n// Reads n8n environment variables when available, otherwise keeps placeholders.\nfunction envOr(name, fallback) {\n  try {\n    const v = (typeof process !== 'undefined' && process.env && process.env[name]) || '';\n    return v ? v : fallback;\n  } catch (e) {\n    return fallback;\n  }\n}\n\nreturn [{\n  json: {\n    applicant_name: envOr('APPLICANT_NAME', '<APPLICANT_NAME>'),\n    applicant_address: envOr('APPLICANT_ADDRESS', '<APPLICANT_ADDRESS>'),\n    applicant_phone: envOr('APPLICANT_PHONE', '<APPLICANT_PHONE>'),\n    applicant_email: envOr('YOUR_EMAIL', '<YOUR_EMAIL>'),\n    fallback_email: envOr('FALLBACK_EMAIL', '<FALLBACK_EMAIL>'),\n    attachments: ['Lebenslauf', 'Zeugnisse']\n  }\n}];"
+      },
+      "id": "a1b2c3d4-0000-4000-8000-applicantprofile",
+      "name": "Applicant Profile",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        520
+      ]
     }
   ],
   "pinData": {},
@@ -665,6 +717,11 @@
         [
           {
             "node": "Parse Telegram Message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Applicant Profile",
             "type": "main",
             "index": 0
           }

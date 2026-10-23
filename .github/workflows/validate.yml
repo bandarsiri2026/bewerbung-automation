@@ -1,0 +1,19 @@
+name: validate-workflows
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check workflow JSON for secrets and broken connections
+        run: python3 scripts/validate_workflows.py
+
+      - name: Test the PDF generator (multi-page layout)
+        run: |
+          node --version
+          node scripts/pdf_test.js

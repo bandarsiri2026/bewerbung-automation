@@ -1,0 +1,279 @@
+%PDF-1.4
+1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R 7 0 R 9 0 R 11 0 R 13 0 R] /Count 6 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 4 0 R /Resources << /Font << /F << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> /FB << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >> >> >> >>
+endobj
+4 0 obj
+<< /Length 3603 >>
+stream
+BT /FB 11 Tf 70.8 800.0 Td (<APPLICANT_NAME>) Tj ET
+BT /F 11 Tf 70.8 786.0 Td (<APPLICANT_ADDRESS>) Tj ET
+BT /F 11 Tf 70.8 772.0 Td (Mobil: <APPLICANT_PHONE>  E-Mail: <YOUR_EMAIL>) Tj ET
+BT /F 11 Tf 70.8 750.0 Td (Test GmbH) Tj ET
+BT /F 11 Tf 70.8 736.0 Td (Frau Beispiel) Tj ET
+BT /F 11 Tf 70.8 722.0 Td (Beispielstra\337e 12) Tj ET
+BT /F 11 Tf 70.8 708.0 Td (Ulm) Tj ET
+BT /F 11 Tf 415.7 750.0 Td (Ulm, den 23.10.2026) Tj ET
+BT /FB 11 Tf 70.8 680.0 Td (Bewerbung als Fachinformatiker f\374r Anwendungsentwicklung) Tj ET
+BT /F 11 Tf 70.8 656.0 Td (Sehr geehrte Damen und Herren,) Tj ET
+BT /F 11 Tf 70.8 634.0 Td (mit gro\337em Interesse habe ich Ihre Stellenausschreibung gelesen. Als) Tj ET
+BT /F 11 Tf 70.8 618.0 Td (Fachinformatiker f\374r Anwendungsentwicklung bringe ich Erfahrung in) Tj ET
+BT /F 11 Tf 70.8 602.0 Td (Automatisierung, API-Integration und Datenverarbeitung mit.) Tj ET
+BT /F 11 Tf 70.8 580.0 Td (In meinen Projekten habe ich Workflows gebaut, die Rohdaten aus \366ffentlichen) Tj ET
+BT /F 11 Tf 70.8 564.0 Td (APIs strukturiert aufbereiten, Dokumente automatisch erzeugen und die) Tj ET
+BT /F 11 Tf 70.8 548.0 Td (Kommunikation zwischen Systemen orchestrieren. Dabei trenne ich bewusst) Tj ET
+BT /F 11 Tf 70.8 532.0 Td (deterministische Logik von KI-gest\374tzten Schritten: Parsing, Validierung und) Tj ET
+BT /F 11 Tf 70.8 516.0 Td (Dokumentenerzeugung sind deterministisch, nur Textextraktion und Formulierung) Tj ET
+BT /F 11 Tf 70.8 500.0 Td (\374bernehmen Modelle.) Tj ET
+BT /F 11 Tf 70.8 478.0 Td (Besonders reizvoll finde ich die Frage, wie man Zuverl\344ssigkeit in solchen) Tj ET
+BT /F 11 Tf 70.8 462.0 Td (Systemen messbar macht - Retry-Logik, Fehler-Triggers und Audit-Protokolle) Tj ET
+BT /F 11 Tf 70.8 446.0 Td (geh\366ren genauso zur Implementierung wie der Happy Path.) Tj ET
+BT /F 11 Tf 70.8 424.0 Td (\334ber eine Einladung zu einem Vorstellungsgespr\344ch w\374rde ich mich sehr freuen und) Tj ET
+BT /F 11 Tf 70.8 408.0 Td (stehe f\374r R\374ckfragen jederzeit gerne zur Verf\374gung.) Tj ET
+BT /F 11 Tf 70.8 386.0 Td (Mit freundlichen Gr\374\337en) Tj ET
+BT /F 11 Tf 70.8 364.0 Td (Sehr geehrte Damen und Herren,) Tj ET
+BT /F 11 Tf 70.8 342.0 Td (mit gro\337em Interesse habe ich Ihre Stellenausschreibung gelesen. Als) Tj ET
+BT /F 11 Tf 70.8 326.0 Td (Fachinformatiker f\374r Anwendungsentwicklung bringe ich Erfahrung in) Tj ET
+BT /F 11 Tf 70.8 310.0 Td (Automatisierung, API-Integration und Datenverarbeitung mit.) Tj ET
+BT /F 11 Tf 70.8 288.0 Td (In meinen Projekten habe ich Workflows gebaut, die Rohdaten aus \366ffentlichen) Tj ET
+BT /F 11 Tf 70.8 272.0 Td (APIs strukturiert aufbereiten, Dokumente automatisch erzeugen und die) Tj ET
+BT /F 11 Tf 70.8 256.0 Td (Kommunikation zwischen Systemen orchestrieren. Dabei trenne ich bewusst) Tj ET
+BT /F 11 Tf 70.8 240.0 Td (deterministische Logik von KI-gest\374tzten Schritten: Parsing, Validierung und) Tj ET
+BT /F 11 Tf 70.8 224.0 Td (Dokumentenerzeugung sind deterministisch, nur Textextraktion und Formulierung) Tj ET
+BT /F 11 Tf 70.8 208.0 Td (\374bernehmen Modelle.) Tj ET
+BT /F 11 Tf 70.8 186.0 Td (Besonders reizvoll finde ich die Frage, wie man Zuverl\344ssigkeit in solchen) Tj ET
+BT /F 11 Tf 70.8 170.0 Td (Systemen messbar macht - Retry-Logik, Fehler-Triggers und Audit-Protokolle) Tj ET
+BT /F 11 Tf 70.8 154.0 Td (geh\366ren genauso zur Implementierung wie der Happy Path.) Tj ET
+BT /F 11 Tf 70.8 132.0 Td (\334ber eine Einladung zu einem Vorstellungsgespr\344ch w\374rde ich mich sehr freuen und) Tj ET
+BT /F 11 Tf 70.8 116.0 Td (stehe f\374r R\374ckfragen jederzeit gerne zur Verf\374gung.) Tj ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 6 0 R /Resources << /Font << /F << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> /FB << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >> >> >> >>
+endobj
+6 0 obj
+<< /Length 3796 >>
+stream
+BT /F 11 Tf 70.8 800.0 Td (Mit freundlichen Gr\374\337en) Tj ET
+BT /F 11 Tf 70.8 778.0 Td (Sehr geehrte Damen und Herren,) Tj ET
+BT /F 11 Tf 70.8 756.0 Td (mit gro\337em Interesse habe ich Ihre Stellenausschreibung gelesen. Als) Tj ET
+BT /F 11 Tf 70.8 740.0 Td (Fachinformatiker f\374r Anwendungsentwicklung bringe ich Erfahrung in) Tj ET
+BT /F 11 Tf 70.8 724.0 Td (Automatisierung, API-Integration und Datenverarbeitung mit.) Tj ET
+BT /F 11 Tf 70.8 702.0 Td (In meinen Projekten habe ich Workflows gebaut, die Rohdaten aus \366ffentlichen) Tj ET
+BT /F 11 Tf 70.8 686.0 Td (APIs strukturiert aufbereiten, Dokumente automatisch erzeugen und die) Tj ET
+BT /F 11 Tf 70.8 670.0 Td (Kommunikation zwischen Systemen orchestrieren. Dabei trenne ich bewusst) Tj ET
+BT /F 11 Tf 70.8 654.0 Td (deterministische Logik von KI-gest\374tzten Schritten: Parsing, Validierung und) Tj ET
+BT /F 11 Tf 70.8 638.0 Td (Dokumentenerzeugung sind deterministisch, nur Textextraktion und Formulierung) Tj ET
+BT /F 11 Tf 70.8 622.0 Td (\374bernehmen Modelle.) Tj ET
+BT /F 11 Tf 70.8 600.0 Td (Besonders reizvoll finde ich die Frage, wie man Zuverl\344ssigkeit in solchen) Tj ET
+BT /F 11 Tf 70.8 584.0 Td (Systemen messbar macht - Retry-Logik, Fehler-Triggers und Audit-Protokolle) Tj ET
+BT /F 11 Tf 70.8 568.0 Td (geh\366ren genauso zur Implementierung wie der Happy Path.) Tj ET
+BT /F 11 Tf 70.8 546.0 Td (\334ber eine Einladung zu einem Vorstellungsgespr\344ch w\374rde ich mich sehr freuen und) Tj ET
+BT /F 11 Tf 70.8 530.0 Td (stehe f\374r R\374ckfragen jederzeit gerne zur Verf\374gung.) Tj ET
+BT /F 11 Tf 70.8 508.0 Td (Mit freundlichen Gr\374\337en) Tj ET
+BT /F 11 Tf 70.8 486.0 Td (Sehr geehrte Damen und Herren,) Tj ET
+BT /F 11 Tf 70.8 464.0 Td (mit gro\337em Interesse habe ich Ihre Stellenausschreibung gelesen. Als) Tj ET
+BT /F 11 Tf 70.8 448.0 Td (Fachinformatiker f\374r Anwendungsentwicklung bringe ich Erfahrung in) Tj ET
+BT /F 11 Tf 70.8 432.0 Td (Automatisierung, API-Integration und Datenverarbeitung mit.) Tj ET
+BT /F 11 Tf 70.8 410.0 Td (In meinen Projekten habe ich Workflows gebaut, die Rohdaten aus \366ffentlichen) Tj ET
+BT /F 11 Tf 70.8 394.0 Td (APIs strukturiert aufbereiten, Dokumente automatisch erzeugen und die) Tj ET
+BT /F 11 Tf 70.8 378.0 Td (Kommunikation zwischen Systemen orchestrieren. Dabei trenne ich bewusst) Tj ET
+BT /F 11 Tf 70.8 362.0 Td (deterministische Logik von KI-gest\374tzten Schritten: Parsing, Validierung und) Tj ET
+BT /F 11 Tf 70.8 346.0 Td (Dokumentenerzeugung sind deterministisch, nur Textextraktion und Formulierung) Tj ET
+BT /F 11 Tf 70.8 330.0 Td (\374bernehmen Modelle.) Tj ET
+BT /F 11 Tf 70.8 308.0 Td (Besonders reizvoll finde ich die Frage, wie man Zuverl\344ssigkeit in solchen) Tj ET
+BT /F 11 Tf 70.8 292.0 Td (Systemen messbar macht - Retry-Logik, Fehler-Triggers und Audit-Protokolle) Tj ET
+BT /F 11 Tf 70.8 276.0 Td (geh\366ren genauso zur Implementierung wie der Happy Path.) Tj ET
+BT /F 11 Tf 70.8 254.0 Td (\334ber eine Einladung zu einem Vorstellungsgespr\344ch w\374rde ich mich sehr freuen und) Tj ET
+BT /F 11 Tf 70.8 238.0 Td (stehe f\374r R\374ckfragen jederzeit gerne zur Verf\374gung.) Tj ET
+BT /F 11 Tf 70.8 216.0 Td (Mit freundlichen Gr\374\337en) Tj ET
+BT /F 11 Tf 70.8 194.0 Td (Sehr geehrte Damen und Herren,) Tj ET
+BT /F 11 Tf 70.8 172.0 Td (mit gro\337em Interesse habe ich Ihre Stellenausschreibung gelesen. Als) Tj ET
+BT /F 11 Tf 70.8 156.0 Td (Fachinformatiker f\374r Anwendungsentwicklung bringe ich Erfahrung in) Tj ET
+BT /F 11 Tf 70.8 140.0 Td (Automatisierung, API-Integration und Datenverarbeitung mit.) Tj ET
+BT /F 11 Tf 70.8 118.0 Td (In meinen Projekten habe ich Workflows gebaut, die Rohdaten aus \366ffentlichen) Tj ET
+BT /F 11 Tf 70.8 102.0 Td (APIs strukturiert aufbereiten, Dokumente automatisch erzeugen und die) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 8 0 R /Resources << /Font << /F << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> /FB << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >> >> >> >>
+endobj
+8 0 obj
+<< /Length 3848 >>
+stream
+BT /F 11 Tf 70.8 800.0 Td (Kommunikation zwischen Systemen orchestrieren. Dabei trenne ich bewusst) Tj ET
+BT /F 11 Tf 70.8 784.0 Td (deterministische Logik von KI-gest\374tzten Schritten: Parsing, Validierung und) Tj ET
+BT /F 11 Tf 70.8 768.0 Td (Dokumentenerzeugung sind deterministisch, nur Textextraktion und Formulierung) Tj ET
+BT /F 11 Tf 70.8 752.0 Td (\374bernehmen Modelle.) Tj ET
+BT /F 11 Tf 70.8 730.0 Td (Besonders reizvoll finde ich die Frage, wie man Zuverl\344ssigkeit in solchen) Tj ET
+BT /F 11 Tf 70.8 714.0 Td (Systemen messbar macht - Retry-Logik, Fehler-Triggers und Audit-Protokolle) Tj ET
+BT /F 11 Tf 70.8 698.0 Td (geh\366ren genauso zur Implementierung wie der Happy Path.) Tj ET
+BT /F 11 Tf 70.8 676.0 Td (\334ber eine Einladung zu einem Vorstellungsgespr\344ch w\374rde ich mich sehr freuen und) Tj ET
+BT /F 11 Tf 70.8 660.0 Td (stehe f\374r R\374ckfragen jederzeit gerne zur Verf\374gung.) Tj ET
+BT /F 11 Tf 70.8 638.0 Td (Mit freundlichen Gr\374\337en) Tj ET
+BT /F 11 Tf 70.8 616.0 Td (Sehr geehrte Damen und Herren,) Tj ET
+BT /F 11 Tf 70.8 594.0 Td (mit gro\337em Interesse habe ich Ihre Stellenausschreibung gelesen. Als) Tj ET
+BT /F 11 Tf 70.8 578.0 Td (Fachinformatiker f\374r Anwendungsentwicklung bringe ich Erfahrung in) Tj ET
+BT /F 11 Tf 70.8 562.0 Td (Automatisierung, API-Integration und Datenverarbeitung mit.) Tj ET
+BT /F 11 Tf 70.8 540.0 Td (In meinen Projekten habe ich Workflows gebaut, die Rohdaten aus \366ffentlichen) Tj ET
+BT /F 11 Tf 70.8 524.0 Td (APIs strukturiert aufbereiten, Dokumente automatisch erzeugen und die) Tj ET
+BT /F 11 Tf 70.8 508.0 Td (Kommunikation zwischen Systemen orchestrieren. Dabei trenne ich bewusst) Tj ET
+BT /F 11 Tf 70.8 492.0 Td (deterministische Logik von KI-gest\374tzten Schritten: Parsing, Validierung und) Tj ET
+BT /F 11 Tf 70.8 476.0 Td (Dokumentenerzeugung sind deterministisch, nur Textextraktion und Formulierung) Tj ET
+BT /F 11 Tf 70.8 460.0 Td (\374bernehmen Modelle.) Tj ET
+BT /F 11 Tf 70.8 438.0 Td (Besonders reizvoll finde ich die Frage, wie man Zuverl\344ssigkeit in solchen) Tj ET
+BT /F 11 Tf 70.8 422.0 Td (Systemen messbar macht - Retry-Logik, Fehler-Triggers und Audit-Protokolle) Tj ET
+BT /F 11 Tf 70.8 406.0 Td (geh\366ren genauso zur Implementierung wie der Happy Path.) Tj ET
+BT /F 11 Tf 70.8 384.0 Td (\334ber eine Einladung zu einem Vorstellungsgespr\344ch w\374rde ich mich sehr freuen und) Tj ET
+BT /F 11 Tf 70.8 368.0 Td (stehe f\374r R\374ckfragen jederzeit gerne zur Verf\374gung.) Tj ET
+BT /F 11 Tf 70.8 346.0 Td (Mit freundlichen Gr\374\337en) Tj ET
+BT /F 11 Tf 70.8 324.0 Td (Sehr geehrte Damen und Herren,) Tj ET
+BT /F 11 Tf 70.8 302.0 Td (mit gro\337em Interesse habe ich Ihre Stellenausschreibung gelesen. Als) Tj ET
+BT /F 11 Tf 70.8 286.0 Td (Fachinformatiker f\374r Anwendungsentwicklung bringe ich Erfahrung in) Tj ET
+BT /F 11 Tf 70.8 270.0 Td (Automatisierung, API-Integration und Datenverarbeitung mit.) Tj ET
+BT /F 11 Tf 70.8 248.0 Td (In meinen Projekten habe ich Workflows gebaut, die Rohdaten aus \366ffentlichen) Tj ET
+BT /F 11 Tf 70.8 232.0 Td (APIs strukturiert aufbereiten, Dokumente automatisch erzeugen und die) Tj ET
+BT /F 11 Tf 70.8 216.0 Td (Kommunikation zwischen Systemen orchestrieren. Dabei trenne ich bewusst) Tj ET
+BT /F 11 Tf 70.8 200.0 Td (deterministische Logik von KI-gest\374tzten Schritten: Parsing, Validierung und) Tj ET
+BT /F 11 Tf 70.8 184.0 Td (Dokumentenerzeugung sind deterministisch, nur Textextraktion und Formulierung) Tj ET
+BT /F 11 Tf 70.8 168.0 Td (\374bernehmen Modelle.) Tj ET
+BT /F 11 Tf 70.8 146.0 Td (Besonders reizvoll finde ich die Frage, wie man Zuverl\344ssigkeit in solchen) Tj ET
+BT /F 11 Tf 70.8 130.0 Td (Systemen messbar macht - Retry-Logik, Fehler-Triggers und Audit-Protokolle) Tj ET
+BT /F 11 Tf 70.8 114.0 Td (geh\366ren genauso zur Implementierung wie der Happy Path.) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 10 0 R /Resources << /Font << /F << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> /FB << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >> >> >> >>
+endobj
+10 0 obj
+<< /Length 3797 >>
+stream
+BT /F 11 Tf 70.8 800.0 Td (\334ber eine Einladung zu einem Vorstellungsgespr\344ch w\374rde ich mich sehr freuen und) Tj ET
+BT /F 11 Tf 70.8 784.0 Td (stehe f\374r R\374ckfragen jederzeit gerne zur Verf\374gung.) Tj ET
+BT /F 11 Tf 70.8 762.0 Td (Mit freundlichen Gr\374\337en) Tj ET
+BT /F 11 Tf 70.8 740.0 Td (Sehr geehrte Damen und Herren,) Tj ET
+BT /F 11 Tf 70.8 718.0 Td (mit gro\337em Interesse habe ich Ihre Stellenausschreibung gelesen. Als) Tj ET
+BT /F 11 Tf 70.8 702.0 Td (Fachinformatiker f\374r Anwendungsentwicklung bringe ich Erfahrung in) Tj ET
+BT /F 11 Tf 70.8 686.0 Td (Automatisierung, API-Integration und Datenverarbeitung mit.) Tj ET
+BT /F 11 Tf 70.8 664.0 Td (In meinen Projekten habe ich Workflows gebaut, die Rohdaten aus \366ffentlichen) Tj ET
+BT /F 11 Tf 70.8 648.0 Td (APIs strukturiert aufbereiten, Dokumente automatisch erzeugen und die) Tj ET
+BT /F 11 Tf 70.8 632.0 Td (Kommunikation zwischen Systemen orchestrieren. Dabei trenne ich bewusst) Tj ET
+BT /F 11 Tf 70.8 616.0 Td (deterministische Logik von KI-gest\374tzten Schritten: Parsing, Validierung und) Tj ET
+BT /F 11 Tf 70.8 600.0 Td (Dokumentenerzeugung sind deterministisch, nur Textextraktion und Formulierung) Tj ET
+BT /F 11 Tf 70.8 584.0 Td (\374bernehmen Modelle.) Tj ET
+BT /F 11 Tf 70.8 562.0 Td (Besonders reizvoll finde ich die Frage, wie man Zuverl\344ssigkeit in solchen) Tj ET
+BT /F 11 Tf 70.8 546.0 Td (Systemen messbar macht - Retry-Logik, Fehler-Triggers und Audit-Protokolle) Tj ET
+BT /F 11 Tf 70.8 530.0 Td (geh\366ren genauso zur Implementierung wie der Happy Path.) Tj ET
+BT /F 11 Tf 70.8 508.0 Td (\334ber eine Einladung zu einem Vorstellungsgespr\344ch w\374rde ich mich sehr freuen und) Tj ET
+BT /F 11 Tf 70.8 492.0 Td (stehe f\374r R\374ckfragen jederzeit gerne zur Verf\374gung.) Tj ET
+BT /F 11 Tf 70.8 470.0 Td (Mit freundlichen Gr\374\337en) Tj ET
+BT /F 11 Tf 70.8 448.0 Td (Sehr geehrte Damen und Herren,) Tj ET
+BT /F 11 Tf 70.8 426.0 Td (mit gro\337em Interesse habe ich Ihre Stellenausschreibung gelesen. Als) Tj ET
+BT /F 11 Tf 70.8 410.0 Td (Fachinformatiker f\374r Anwendungsentwicklung bringe ich Erfahrung in) Tj ET
+BT /F 11 Tf 70.8 394.0 Td (Automatisierung, API-Integration und Datenverarbeitung mit.) Tj ET
+BT /F 11 Tf 70.8 372.0 Td (In meinen Projekten habe ich Workflows gebaut, die Rohdaten aus \366ffentlichen) Tj ET
+BT /F 11 Tf 70.8 356.0 Td (APIs strukturiert aufbereiten, Dokumente automatisch erzeugen und die) Tj ET
+BT /F 11 Tf 70.8 340.0 Td (Kommunikation zwischen Systemen orchestrieren. Dabei trenne ich bewusst) Tj ET
+BT /F 11 Tf 70.8 324.0 Td (deterministische Logik von KI-gest\374tzten Schritten: Parsing, Validierung und) Tj ET
+BT /F 11 Tf 70.8 308.0 Td (Dokumentenerzeugung sind deterministisch, nur Textextraktion und Formulierung) Tj ET
+BT /F 11 Tf 70.8 292.0 Td (\374bernehmen Modelle.) Tj ET
+BT /F 11 Tf 70.8 270.0 Td (Besonders reizvoll finde ich die Frage, wie man Zuverl\344ssigkeit in solchen) Tj ET
+BT /F 11 Tf 70.8 254.0 Td (Systemen messbar macht - Retry-Logik, Fehler-Triggers und Audit-Protokolle) Tj ET
+BT /F 11 Tf 70.8 238.0 Td (geh\366ren genauso zur Implementierung wie der Happy Path.) Tj ET
+BT /F 11 Tf 70.8 216.0 Td (\334ber eine Einladung zu einem Vorstellungsgespr\344ch w\374rde ich mich sehr freuen und) Tj ET
+BT /F 11 Tf 70.8 200.0 Td (stehe f\374r R\374ckfragen jederzeit gerne zur Verf\374gung.) Tj ET
+BT /F 11 Tf 70.8 178.0 Td (Mit freundlichen Gr\374\337en) Tj ET
+BT /F 11 Tf 70.8 156.0 Td (Sehr geehrte Damen und Herren,) Tj ET
+BT /F 11 Tf 70.8 134.0 Td (mit gro\337em Interesse habe ich Ihre Stellenausschreibung gelesen. Als) Tj ET
+BT /F 11 Tf 70.8 118.0 Td (Fachinformatiker f\374r Anwendungsentwicklung bringe ich Erfahrung in) Tj ET
+BT /F 11 Tf 70.8 102.0 Td (Automatisierung, API-Integration und Datenverarbeitung mit.) Tj ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 12 0 R /Resources << /Font << /F << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> /FB << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >> >> >> >>
+endobj
+12 0 obj
+<< /Length 3972 >>
+stream
+BT /F 11 Tf 70.8 800.0 Td (In meinen Projekten habe ich Workflows gebaut, die Rohdaten aus \366ffentlichen) Tj ET
+BT /F 11 Tf 70.8 784.0 Td (APIs strukturiert aufbereiten, Dokumente automatisch erzeugen und die) Tj ET
+BT /F 11 Tf 70.8 768.0 Td (Kommunikation zwischen Systemen orchestrieren. Dabei trenne ich bewusst) Tj ET
+BT /F 11 Tf 70.8 752.0 Td (deterministische Logik von KI-gest\374tzten Schritten: Parsing, Validierung und) Tj ET
+BT /F 11 Tf 70.8 736.0 Td (Dokumentenerzeugung sind deterministisch, nur Textextraktion und Formulierung) Tj ET
+BT /F 11 Tf 70.8 720.0 Td (\374bernehmen Modelle.) Tj ET
+BT /F 11 Tf 70.8 698.0 Td (Besonders reizvoll finde ich die Frage, wie man Zuverl\344ssigkeit in solchen) Tj ET
+BT /F 11 Tf 70.8 682.0 Td (Systemen messbar macht - Retry-Logik, Fehler-Triggers und Audit-Protokolle) Tj ET
+BT /F 11 Tf 70.8 666.0 Td (geh\366ren genauso zur Implementierung wie der Happy Path.) Tj ET
+BT /F 11 Tf 70.8 644.0 Td (\334ber eine Einladung zu einem Vorstellungsgespr\344ch w\374rde ich mich sehr freuen und) Tj ET
+BT /F 11 Tf 70.8 628.0 Td (stehe f\374r R\374ckfragen jederzeit gerne zur Verf\374gung.) Tj ET
+BT /F 11 Tf 70.8 606.0 Td (Mit freundlichen Gr\374\337en) Tj ET
+BT /F 11 Tf 70.8 584.0 Td (Sehr geehrte Damen und Herren,) Tj ET
+BT /F 11 Tf 70.8 562.0 Td (mit gro\337em Interesse habe ich Ihre Stellenausschreibung gelesen. Als) Tj ET
+BT /F 11 Tf 70.8 546.0 Td (Fachinformatiker f\374r Anwendungsentwicklung bringe ich Erfahrung in) Tj ET
+BT /F 11 Tf 70.8 530.0 Td (Automatisierung, API-Integration und Datenverarbeitung mit.) Tj ET
+BT /F 11 Tf 70.8 508.0 Td (In meinen Projekten habe ich Workflows gebaut, die Rohdaten aus \366ffentlichen) Tj ET
+BT /F 11 Tf 70.8 492.0 Td (APIs strukturiert aufbereiten, Dokumente automatisch erzeugen und die) Tj ET
+BT /F 11 Tf 70.8 476.0 Td (Kommunikation zwischen Systemen orchestrieren. Dabei trenne ich bewusst) Tj ET
+BT /F 11 Tf 70.8 460.0 Td (deterministische Logik von KI-gest\374tzten Schritten: Parsing, Validierung und) Tj ET
+BT /F 11 Tf 70.8 444.0 Td (Dokumentenerzeugung sind deterministisch, nur Textextraktion und Formulierung) Tj ET
+BT /F 11 Tf 70.8 428.0 Td (\374bernehmen Modelle.) Tj ET
+BT /F 11 Tf 70.8 406.0 Td (Besonders reizvoll finde ich die Frage, wie man Zuverl\344ssigkeit in solchen) Tj ET
+BT /F 11 Tf 70.8 390.0 Td (Systemen messbar macht - Retry-Logik, Fehler-Triggers und Audit-Protokolle) Tj ET
+BT /F 11 Tf 70.8 374.0 Td (geh\366ren genauso zur Implementierung wie der Happy Path.) Tj ET
+BT /F 11 Tf 70.8 352.0 Td (\334ber eine Einladung zu einem Vorstellungsgespr\344ch w\374rde ich mich sehr freuen und) Tj ET
+BT /F 11 Tf 70.8 336.0 Td (stehe f\374r R\374ckfragen jederzeit gerne zur Verf\374gung.) Tj ET
+BT /F 11 Tf 70.8 314.0 Td (Mit freundlichen Gr\374\337en) Tj ET
+BT /F 11 Tf 70.8 292.0 Td (Sehr geehrte Damen und Herren,) Tj ET
+BT /F 11 Tf 70.8 270.0 Td (mit gro\337em Interesse habe ich Ihre Stellenausschreibung gelesen. Als) Tj ET
+BT /F 11 Tf 70.8 254.0 Td (Fachinformatiker f\374r Anwendungsentwicklung bringe ich Erfahrung in) Tj ET
+BT /F 11 Tf 70.8 238.0 Td (Automatisierung, API-Integration und Datenverarbeitung mit.) Tj ET
+BT /F 11 Tf 70.8 216.0 Td (In meinen Projekten habe ich Workflows gebaut, die Rohdaten aus \366ffentlichen) Tj ET
+BT /F 11 Tf 70.8 200.0 Td (APIs strukturiert aufbereiten, Dokumente automatisch erzeugen und die) Tj ET
+BT /F 11 Tf 70.8 184.0 Td (Kommunikation zwischen Systemen orchestrieren. Dabei trenne ich bewusst) Tj ET
+BT /F 11 Tf 70.8 168.0 Td (deterministische Logik von KI-gest\374tzten Schritten: Parsing, Validierung und) Tj ET
+BT /F 11 Tf 70.8 152.0 Td (Dokumentenerzeugung sind deterministisch, nur Textextraktion und Formulierung) Tj ET
+BT /F 11 Tf 70.8 136.0 Td (\374bernehmen Modelle.) Tj ET
+BT /F 11 Tf 70.8 114.0 Td (Besonders reizvoll finde ich die Frage, wie man Zuverl\344ssigkeit in solchen) Tj ET
+BT /F 11 Tf 70.8 98.0 Td (Systemen messbar macht - Retry-Logik, Fehler-Triggers und Audit-Protokolle) Tj ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 14 0 R /Resources << /Font << /F << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> /FB << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >> >> >> >>
+endobj
+14 0 obj
+<< /Length 507 >>
+stream
+BT /F 11 Tf 70.8 800.0 Td (geh\366ren genauso zur Implementierung wie der Happy Path.) Tj ET
+BT /F 11 Tf 70.8 778.0 Td (\334ber eine Einladung zu einem Vorstellungsgespr\344ch w\374rde ich mich sehr freuen und) Tj ET
+BT /F 11 Tf 70.8 762.0 Td (stehe f\374r R\374ckfragen jederzeit gerne zur Verf\374gung.) Tj ET
+BT /F 11 Tf 70.8 740.0 Td (Mit freundlichen Gr\374\337en) Tj ET
+BT /F 11 Tf 70.8 718.0 Td (Anlagen:) Tj ET
+BT /F 11 Tf 70.8 702.0 Td (Lebenslauf) Tj ET
+BT /F 11 Tf 70.8 686.0 Td (Zeugnisse) Tj ET
+endstream
+endobj
+xref
+0 15
+0000000000 65535 f 
+0000000009 00000 n 
+0000000060 00000 n 
+0000000149 00000 n 
+0000000447 00000 n 
+0000004102 00000 n 
+0000004400 00000 n 
+0000008248 00000 n 
+0000008546 00000 n 
+0000012446 00000 n 
+0000012745 00000 n 
+0000016595 00000 n 
+0000016895 00000 n 
+0000020920 00000 n 
+0000021220 00000 n 
+trailer
+<< /Size 15 /Root 1 0 R >>
+startxref
+21779
+%%EOF

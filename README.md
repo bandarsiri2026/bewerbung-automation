@@ -31,16 +31,17 @@ Applying to jobs in Germany is repetitive and error-prone: every posting has to 
 
 ## 3. Architecture overview
 
-The project contains two independent workflows:
+This repository contains **two workflows** plus a shared error handler:
 
-1. **`Bewerbung My`** (active) — the application pipeline described below.
-2. **`Answer from vector v2`** (inactive) — an experimental RAG assistant: Telegram text/voice/image → transcription or OCR → AI agent with a Supabase vector store and Postgres chat memory, optionally replying with generated speech. It also contains a manual ingestion branch that loads a PDF into the vector database.
+1. **`Bewerbung My`** (active, 24 nodes) — the application pipeline described below.
+2. **`Answer from vector v2`** (inactive, 25 nodes) — an experimental multimodal RAG assistant: Telegram text/voice/image → transcription or OCR → AI agent with a Supabase vector store and Postgres chat memory, optionally replying with generated speech. Three of its nodes are disabled by design.
+3. **`Workflow Error Handler`** (3 nodes) — Error Trigger → error summary → Telegram alert; attach it as the *Error Workflow* of the other two.
 
-Canvas view of the active pipeline (23 nodes):
+Canvas view of the active pipeline (24 nodes):
 
 ![Bewerbung My workflow](docs/workflow-a-bewerbung-my.png)
 
-### Workflow A — `Bewerbung My` (23 nodes)
+### Workflow A — `Bewerbung My` (24 nodes)
 ```mermaid
 flowchart LR
   TG[Telegram Trigger] --> PARSE[Parse Telegram Message<br/>JS: keyword + URL + e-mail regex]
@@ -93,6 +94,14 @@ flowchart LR
   URT[GetUserRecord Supabase tool<br/>disabled] -. ai_tool .-> AG
 ```
 
+### Error handler — `Workflow Error Handler` (3 nodes)
+
+```mermaid
+flowchart LR
+  ET[Error Trigger] --> SUM[Summarize Error<br/>workflow, node, message, timestamp]
+  SUM --> TG[Notify on Telegram]
+```
+
 ## 4. Technologies and integrations
 
 | Layer | Technology |
@@ -101,9 +110,9 @@ flowchart LR
 | Messaging | Telegram Bot API (trigger + send text/audio) |
 | E-mail | Gmail (draft creation with attachments) |
 | Documents/storage | Google Drive (upload/download), Google Sheets (logging) |
-| AI models | OpenAI GPT-4o (extraction and cover letter), GPT-4.1-mini (agent), GPT-4o-mini (image analysis), Whisper-class transcription, text-to-speech |
-| Vector database / RAG | Supabase vector store + OpenAI embeddings |
-| Conversational memory | Postgres chat memory keyed by Telegram chat ID |
+| AI models | OpenAI GPT-4o (extraction and cover letter), GPT-4.1-mini (agent), GPT-4o-mini (image analysis), transcription + text-to-speech |
+| Vector database / RAG | Supabase vector store + OpenAI embeddings (workflow B) |
+| Conversational memory | Postgres chat memory keyed by Telegram chat ID (workflow B) |
 | External data source | Arbeitsagentur job search REST API (`rest.arbeitsagentur.de`) |
 | Custom code | Node.js Code nodes: regex parsing, JSON enrichment, PDF byte generation |
 
@@ -129,8 +138,8 @@ flowchart LR
 | Google OAuth (Drive) | upload/download documents | folder must exist and be writable |
 | Gmail OAuth | draft creation | drafts are created, not sent |
 | OpenAI API key | three HTTP nodes / agent nodes | store as credential or `OPENAI_API_KEY` env var |
-| Supabase + Postgres credentials | vector store, chat memory, tool | required only for the RAG workflow |
-| Applicant profile data | Code nodes and PDF header | name, address, phone, e-mail — should come from config |
+| Supabase + Postgres credentials | vector store, chat memory, tool (workflow B) | required only for the RAG workflow |
+| Applicant profile data | `Applicant Profile` node and PDF header | name, address, phone, e-mail read from env vars |
 
 Recommended environment variables (self-hosted n8n):
 ```bash
@@ -138,7 +147,9 @@ OPENAI_API_KEY=...            # never commit this
 APPLICANT_NAME=...
 APPLICANT_ADDRESS=...
 APPLICANT_PHONE=...
-APPLICANT_EMAIL=...
+YOUR_EMAIL=...                # your own address, used in the PDF header
+FALLBACK_EMAIL=...            # used when no contact e-mail is found
+TELEGRAM_CHAT_ID=...          # only for the error-handler workflow
 ```
 
 ## 7. Safe credential setup
@@ -170,7 +181,7 @@ If instead the user pastes plain job text (no URL), steps 3–4 use the text bra
 
 ## 9. Error handling and troubleshooting
 
-**Currently configured:** only defensive parsing inside the Code nodes (`try/catch` around `JSON.parse`, regex fallback for e-mail extraction, default values such as "Unknown Company"). There are **no retries, no error branches and no error-trigger workflow** in either file.
+**Currently configured:** defensive parsing inside the Code nodes (`try/catch` around `JSON.parse`, regex fallback for e-mail extraction, default values such as "Unknown Company"), **`retryOnFail: true` / `maxTries: 3` / `waitBetweenRetries: 2` on every HTTP node**, and a companion **Error Handler workflow** (`workflows/error-handler.sanitized.json`) that reports the failing node and message back to Telegram.
 
 Common failure modes observed from the configuration:
 | Symptom | Cause | Fix |
@@ -178,7 +189,7 @@ Common failure modes observed from the configuration:
 | HTTP 404 from the job API | URL contained no reference number → empty base64 path | validate `refnr` before calling; fall back to text branch |
 | "Unknown Company / Unknown Position" | model returned non-JSON or empty text input | add validation and a Telegram warning instead of continuing |
 | Application addressed to the wrong mailbox | fallback e-mail used when no contact found | stop and ask the user for the recipient |
-| PDF content cut off | single-page layout stops writing at `y < 80` | implement multi-page output or limit letter length |
+| PDF content cut off | previously the layout stopped writing at `y < 80` | fixed: the generator now paginates; verified by `scripts/pdf_test.js` |
 | Workflow does nothing on a message | Switch/If rules do not match (e.g. a PDF attachment) | add a fallback rule |
 | Attachment missing in the draft | Drive file ID changed or permission error | verify IDs and OAuth scope |
 
@@ -191,23 +202,29 @@ Recommended improvements: enable `retryOnFail` on HTTP nodes, add an Error Trigg
 - Personal data is externalised to configuration rather than hard-coded.
 - Applications are only drafted, never auto-sent, which prevents accidental mass mailings.
 
-## 11. Current limitations and future improvements
+## 11. Hardening already applied vs. still planned
 
-**Limitations present in the workflow as exported**
-- Only Arbeitsagentur URLs are fetched; other portals fall back to pasted text.
-- Single-page PDF only; long letters are silently truncated.
-- No retry or error notification path.
-- The RAG workflow is inactive and its ingestion branch is not connected to a trigger (manual run only); three of its nodes are disabled.
-- Some parsed flags (`yes`/`no`) are computed but never used — dead code.
+**Implemented in this repository**
+- `retryOnFail` / `maxTries: 3` / `waitBetweenRetries: 2` on all HTTP nodes (job API and the three OpenAI calls).
+- Multi-page PDF generation instead of the original single-page truncation, plus a standalone Node.js test harness (`scripts/pdf_test.js`) that renders `docs/sample-anschreiben.pdf` outside n8n.
+- A companion **Error Handler** workflow (`workflows/error-handler.sanitized.json`: Error Trigger → Code summary → Telegram notification).
+- Applicant profile moved into its own `Applicant Profile` node instead of hard-coded strings inside the PDF code.
+- Dead code removed (the unused `is_yes` / `is_no` flags from the message parser).
 
-**Planned improvements**
+**Still planned**
 1. Replace raw HTTP calls with n8n's OpenAI nodes and credential-based auth.
 2. Add a validation node that rejects incomplete job data before PDF generation.
-3. Multi-page PDF support or HTML→PDF rendering.
-4. Error handling: `retryOnFail`, error branches, Telegram failure notifications.
-5. Config-driven applicant profile (Google Sheet or env vars) instead of hard-coded strings.
-6. Unit-testable pure functions for parsing and PDF layout.
-7. Scheduled digest of applications from the tracking sheet.
+3. Fallback rule for unsupported message types (PDF attachments, stickers).
+4. Scheduled digest of applications from the tracking sheet.
+5. Unit tests for the parsing functions extracted into a standalone module.
+
+**Run the PDF test locally**
+
+```bash
+node scripts/pdf_test.js   # writes docs/sample-anschreiben.pdf
+```
+
+It exercises the same `buildPdf()` logic used by the workflow's Code node, so you can verify layout and pagination without n8n or an API key.
 
 ## 12. AI assistance disclosure
 
@@ -218,23 +235,28 @@ This project was developed with AI assistance. The workflow structure and severa
 This project is released under the **MIT License** (see `LICENSE`).
 
 
-## 14. Suggested repository structure
+## 14. Repository structure
 
 ```text
 bewerbung-automation/
-├── README.md                     (this file, adapted)
-├── SECURITY_AUDIT.md
-├── PROJECT_ANALYSIS_AR.md        (detailed Arabic technical analysis)
-├── INTERVIEW_PREPARATION.md      (optional — keep private)
+├── README.md                     (this file)
+├── SECURITY_AUDIT.md             (pre-publication security review of the export)
+├── PROJECT_ANALYSIS_AR.md        (detailed Arabic technical analysis, node by node)
 ├── workflows/
-│   ├── bewerbung-my.sanitized.json
-│   └── answer-from-vector-v2.sanitized.json
+│   ├── bewerbung-my.sanitized.json      (main pipeline, 24 nodes)
+│   └── error-handler.sanitized.json     (Error Trigger → Telegram notification)
+├── scripts/
+│   └── pdf_test.js                      (standalone test for the PDF generator)
 ├── docs/
-│   ├── architecture.png          (clean screenshot, no open node panels)
+│   ├── workflow-a-bewerbung-my.png
+│   ├── sample-anschreiben.pdf           (generated by scripts/pdf_test.js, placeholders only)
 │   └── setup.md
 ├── .env.example                  (variable names only, never values)
-└── .gitignore                    (.env, *.local.json, raw exports)
+├── .gitignore                    (.env, raw exports, screenshots)
+└── LICENSE
 ```
+
+The companion RAG assistant lives in [answer-from-vector-v2](https://github.com/bandarsiri2026/answer-from-vector-v2).
 
 `.gitignore` minimum content:
 ```text
