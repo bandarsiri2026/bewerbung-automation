@@ -1,0 +1,925 @@
+{
+  "name": "Bewerbung My",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "2358c3b3-08fa-4afe-bfa3-536a2d0dcc3d",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        192
+      ],
+      "webhookId": "394ca465-731f-4d10-9a3d-7c4452ea59cb",
+      "credentials": {
+        "telegramApi": {
+          "id": "h5qQ884sXj854jSv",
+          "name": "Bewerbung"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $input.first().json;\nconst text = msg.message?.text || '';\nconst chatId = msg.message?.chat?.id;\nconst messageId = msg.message?.message_id;\nconst isApply = text.toLowerCase().startsWith('apply');\nconst isYes = text.toLowerCase() === 'yes' || text === '\\u2705';\nconst isNo = text.toLowerCase() === 'no' || text === '\\u274c';\n\nlet jobUrl = '';\nlet jobText = '';\nlet manualEmail = '';\nlet refnr = '';\n\nif (isApply) {\n  const afterApply = text.replace(/^apply\\s*/i, '');\n\n  // FIX: extract proper email from the full pasted text (handles multiline paste with email buried in it)\n  const emailMatch = afterApply.match(/[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}/);\n  if (emailMatch) {\n    manualEmail = emailMatch[0];\n  }\n\n  // First non-empty token: if it starts with http it's a URL, otherwise treat everything as job text\n  const firstToken = (afterApply.trim().split(/\\s+/)[0]) || '';\n  if (firstToken.startsWith('http')) {\n    jobUrl = firstToken;\n  } else {\n    jobText = afterApply.trim();\n  }\n}\n\nif (jobUrl.includes('arbeitsagentur.de')) {\n  const detailMatch = jobUrl.match(/jobdetail\\/([A-Za-z0-9_-]+)/);\n  const idMatch = jobUrl.match(/[?&]id=([A-Za-z0-9_-]+)/);\n  if (detailMatch) refnr = detailMatch[1];\n  else if (idMatch) refnr = idMatch[1];\n}\n\nreturn [{\n  json: {\n    chat_id: chatId,\n    message_id: messageId,\n    raw_text: text,\n    is_apply: isApply,\n    is_yes: isYes,\n    is_no: isNo,\n    job_url: jobUrl,\n    job_text: jobText,\n    manual_email: manualEmail,\n    refnr: refnr,\n    refnr_b64: Buffer.from(refnr || '').toString('base64')\n  }\n}];"
+      },
+      "id": "7b8167eb-874f-4bdc-8698-2001abb367a9",
+      "name": "Parse Telegram Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "check-apply",
+              "leftValue": "={{ $json.is_apply }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "faea0374-06c0-4615-aa74-0eeb5ece5286",
+      "name": "Is /apply command?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "is-arbeitsagentur",
+              "leftValue": "={{ $json.job_url }}",
+              "rightValue": "arbeitsagentur.de",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a3cc8602-5c69-4f0c-8abb-0afbd2440d72",
+      "name": "Route by URL Type",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "⏳ *Analysiere die Stellenanzeige...*\n\nBitte warte kurz, ich generiere dein Anschreiben.",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "04c617c2-58e7-4bbc-9a8f-e514ff8c2dee",
+      "name": "Send Processing Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        896,
+        0
+      ],
+      "webhookId": "e8360d3e-f7e1-4b43-a33e-bfec8045864c",
+      "credentials": {
+        "telegramApi": {
+          "id": "h5qQ884sXj854jSv",
+          "name": "Bewerbung"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://rest.arbeitsagentur.de/jobboerse/jobsuche-service/pc/v4/jobdetails/{{ $('Parse Telegram Message').first().json.refnr_b64 }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "jobboerse-jobsuche"
+            },
+            {
+              "name": "User-Agent",
+              "value": "Jobsuche/2.9.2 (de.arbeitsagentur.jobboerse; build:1077; iOS 15.1.0) Alamofire/5.4.4"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "96dceecd-f4ea-4f38-9457-8f775765d651",
+      "name": "Fetch Job Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.OPENAI_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: \"gpt-4o\",\n  response_format: { type: \"json_object\" },\n  temperature: 0.1,\n  messages: [\n    { role: \"system\", content: \"You are a specialized job data extraction bot. Your ONLY goal is to fill every field in the provided JSON schema from the Arbeitsagentur API response.\" },\n    { role: \"user\", content: \"Extract all data from this Arbeitsagentur API response.\\n\\nAPI JSON:\\n\" + JSON.stringify($('Fetch Job Page').first().json).substring(0,12000) + \"\\n\\nTelegram Source:\\n\" + (($('Parse Telegram Message').first().json.job_text) || \"\") + \"\\n\\nReturn ONLY this JSON:\\n\" + JSON.stringify({ company_name: \"\", job_title: \"\", location: \"\", job_description: \"\", required_skills: [], contact_email: \"\", hiring_manager: \"\", language: \"de\" }) }\n  ]\n}) }}",
+        "options": {}
+      },
+      "id": "ede70a19-d834-4955-953d-c7fa7f092c19",
+      "name": "Analyze Job Posting (OpenAI)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        0
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "y2n3Vx7MRKjSfoge",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.choices[0].message.content;\nlet jobData;\ntry { jobData = JSON.parse(raw); } catch(e) { const match = raw.match(/\\{[\\s\\S]*\\}/); jobData = match ? JSON.parse(match[0]) : {}; }\nconst telegramData = $('Parse Telegram Message').first().json;\n\n// FIX: regex fallback — extract email from raw job text if GPT missed it\nconst rawText = telegramData.job_text || '';\nconst emailsFound = rawText.match(/[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}/g) || [];\nconst extractedEmail = jobData.contact_email || emailsFound[0] || '';\n\nreturn [{ json: {\n  company_name: jobData.company_name || 'Unknown Company',\n  job_title: jobData.job_title || 'Unknown Position',\n  location: jobData.location || '',\n  job_description: jobData.job_description || '',\n  required_skills: jobData.required_skills || [],\n  contact_email: extractedEmail,\n  hiring_manager: jobData.hiring_manager || '',\n  language: jobData.language || 'de',\n  job_url: telegramData.job_url || '',\n  chat_id: telegramData.chat_id,\n  applicant_name: '<APPLICANT_NAME>',\n  applicant_address: '<APPLICANT_ADDRESS>',\n  applicant_phone: '<APPLICANT_PHONE>',\n  applicant_email: '<YOUR_EMAIL>'\n} }];"
+      },
+      "id": "e2ee1e71-e033-4fc0-9096-95c6df06c8b5",
+      "name": "Parse & Enrich Job Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "fb032427-c10a-4ee4-8dcc-b8dfecedbf4e",
+      "name": "Merge Job Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1792,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const parsed = $('Parse Telegram Message').first().json;\nreturn [{ json: { _source: 'text', stellenbeschreibung: parsed.job_text, arbeitgeber: { name: '' }, angebotsart: '', titel: '', arbeitsort: { ort: '' } } }];"
+      },
+      "id": "c3b219ad-94f8-4fdc-9142-88eefa85ba11",
+      "name": "Normalize Job Text Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.OPENAI_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"gpt-4o\", response_format: { type: \"json_object\" }, temperature: 0.1, messages: [{ role: \"system\", content: \"You are a specialized job data extraction bot. Extract all fields from the provided job text.\" }, { role: \"user\", content: \"Extract all data from this job text.\\n\\nJob Text:\\n\" + ($('Parse Telegram Message').first().json.job_text || $('Normalize Job Text Input').first().json.stellenbeschreibung || '') + \"\\n\\nReturn ONLY this JSON:\\n\" + JSON.stringify({ company_name: \"\", job_title: \"\", location: \"\", job_description: \"\", required_skills: [], contact_email: \"\", hiring_manager: \"\", language: \"de\" }) }] }) }}",
+        "options": {}
+      },
+      "id": "59eff3bc-e061-4a4a-b48e-ef8484369e39",
+      "name": "Analyze Job Text (OpenAI)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        192
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "y2n3Vx7MRKjSfoge",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.choices[0].message.content;\nlet jobData;\ntry { jobData = JSON.parse(raw); } catch(e) { const match = raw.match(/\\{[\\s\\S]*\\}/); jobData = match ? JSON.parse(match[0]) : {}; }\nconst telegramData = $('Parse Telegram Message').first().json;\n\n// FIX: regex fallback — extract email from raw job text if GPT missed it\nconst rawText = telegramData.job_text || '';\nconst emailsFound = rawText.match(/[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}/g) || [];\nconst extractedEmail = jobData.contact_email || emailsFound[0] || '';\n\nreturn [{ json: {\n  company_name: jobData.company_name || 'Unknown Company',\n  job_title: jobData.job_title || 'Unknown Position',\n  location: jobData.location || '',\n  job_description: jobData.job_description || '',\n  required_skills: jobData.required_skills || [],\n  contact_email: extractedEmail,\n  hiring_manager: jobData.hiring_manager || '',\n  language: jobData.language || 'de',\n  job_url: telegramData.job_url || '',\n  chat_id: telegramData.chat_id,\n  applicant_name: '<APPLICANT_NAME>',\n  applicant_address: '<APPLICANT_ADDRESS>',\n  applicant_phone: '<APPLICANT_PHONE>',\n  applicant_email: '<YOUR_EMAIL>'\n} }];"
+      },
+      "id": "13ff2623-51c5-413d-9f40-29fd6dbcae04",
+      "name": "Parse & Enrich Job Data (Text)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "❓ Unbekannter Befehl.\n\nBenutze: `/apply https://stellenanzeige-url.de`",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "52247aad-3a3d-4cb6-bec1-90eaaaf4faf4",
+      "name": "Unknown Command Reply",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        288
+      ],
+      "webhookId": "a9a9ee29-7e8c-4f98-a699-182805f45d81",
+      "credentials": {
+        "telegramApi": {
+          "id": "h5qQ884sXj854jSv",
+          "name": "Bewerbung"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.OPENAI_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  \"model\": \"gpt-4o\",\n  \"temperature\": 0.7,\n  \"max_tokens\": 1800,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Du bist ein professioneller Bewerbungsschreiber. Schreibe authentische deutsche Anschreiben. Gib NUR den reinen Briefkoerper zurueck (ab Anrede bis Grussformel inkl. Name), ohne Absenderblock, ohne Datum, ohne Betreffzeile, ohne Erklaerungen, kein Markdown.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Schreibe den Briefkoerper fuer ein Bewerbungsanschreiben.\\n\\n=== BEWERBER ===\\nName: <APPLICANT_NAME>\\n\\nAusbildung (BEREITS OFFIZIELL IN DEUTSCHLAND ANERKANNT):\\n- Bachelor Wirtschaftswissenschaften Finanzen und Bankwesen, Uni Chlef Algerien 2003-2007, Anabin H+\\n- Master Finanzen und Kredit, Uni Charkiw Ukraine 2009-2011, Anabin H+\\n\\nBerufserfahrung:\\n- 15+ Jahre selbststaendig: Internetcafes mit IT-Service Algerien 2006-2009 und Ukraine 2010-2022\\n- PC Smartphone Reparatur, Netzwerk LAN WLAN, Kundensupport, Systemwartung\\n\\nIT: Windows alle Versionen, Linux, PHP, JavaScript, HTML, CSS, Python, MySQL, MS-Office, Photoshop, WordPress\\nSprachen: Arabisch Muttersprache, Franzoesisch C1, Russisch C1, Deutsch B2, Englisch Grundkenntnisse\\nFuehrerschein B, in Deutschland seit Maerz 2022\\n\\n=== STELLE ===\\nUnternehmen: \" + $input.first().json.company_name + \"\\n\" +\n      \"Position: \" + $input.first().json.job_title + \"\\n\" +\n      \"Ort: \" + $input.first().json.location + \"\\n\" +\n      \"Beschreibung: \" + $input.first().json.job_description + \"\\n\" +\n      \"Skills: \" + ($input.first().json.required_skills ? $input.first().json.required_skills.join(', ') : '') + \"\\n\" +\n      \"Ansprechpartner: \" + ($input.first().json.hiring_manager || '') + \"\\n\\n\" +\n      \"=== FORMAT ===\\n- Anrede: wenn Ansprechpartner bekannt 'Sehr geehrte/r Herr/Frau [Name],' sonst 'Sehr geehrte Damen und Herren,'\\n- 3-4 Absaetze Brieftext\\n- Ende: 'Mit freundlichen Gruessen\\\\n<APPLICANT_NAME>'\\n- Nur Deutsch, formell, max 350 Woerter\"\n    }\n  ]\n}\n}}",
+        "options": {}
+      },
+      "id": "79577fcd-7efb-4b60-9fe9-02ea60226e6a",
+      "name": "Generate Cover Letter (OpenAI)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2016,
+        96
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "y2n3Vx7MRKjSfoge",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const coverLetter = $input.first().json.choices[0].message.content;\nconst job = $('Merge Job Data').first().json;\nconst today = new Date().toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' });\nconst hiringManager = job.hiring_manager || '';\n\nconst firstLine = coverLetter.split('\\n').find(l => l.trim().startsWith('Sehr geehrte'));\nconst greeting = firstLine ? firstLine.trim() : 'Sehr geehrte Damen und Herren,';\n\nconst emailBody = greeting + '\\n\\nanbei sende ich Ihnen meine Bewerbungsunterlagen.\\n\\nÜber eine Einladung zu einem Vorstellungsgespräch würde ich mich sehr freuen.\\n\\nMit freundlichen Grüßen\\n<APPLICANT_NAME>';\nconst subject = 'Bewerbung als ' + job.job_title + ' – <APPLICANT_NAME>';\n\n// Priority: manual_email (cleaned by Parse node) → regex/GPT contact_email → own email as fallback\nconst rawEmail = $('Parse Telegram Message').first().json.manual_email || job.contact_email || '';\nconst toEmail = rawEmail.trim() !== '' ? rawEmail.trim() : '<FALLBACK_EMAIL>';\n\nreturn [{\n  json: {\n    cover_letter: coverLetter,\n    email_subject: subject,\n    email_body: emailBody,\n    greeting: greeting,\n    to_email: toEmail,\n    company_name: job.company_name,\n    job_title: job.job_title,\n    location: job.location || '',\n    hiring_manager: hiringManager,\n    company_address: job.company_address || '',\n    job_url: job.job_url,\n    date_applied: today,\n    applicant_email: job.applicant_email,\n    applicant_name: job.applicant_name,\n    chat_id: job.chat_id\n  }\n}];"
+      },
+      "id": "ce5c9fd4-1086-4df9-a8d4-8659939281bf",
+      "name": "Prepare Email & Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2240,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst data = $('Prepare Email & Summary').first().json;\n\nconst WIN1252 = {\n  '\\u00e4':228,'\\u00f6':246,'\\u00fc':252,\n  '\\u00c4':196,'\\u00d6':214,'\\u00dc':220,\n  '\\u00df':223,'\\u00e9':233,'\\u00e8':232,\n  '\\u00e0':224,'\\u00e2':226,'\\u00ea':234,\n  '\\u00fb':251,'\\u00ee':238,'\\u00ef':239,\n  '\\u2013':150,'\\u2014':151,\n  '\\u2019':146,'\\u201c':147,'\\u201d':148,\n};\n\nfunction escPdf(str) {\n  let r = '';\n  for (const ch of String(str)) {\n    if (WIN1252[ch] !== undefined) {\n      r += '\\\\' + WIN1252[ch].toString(8).padStart(3,'0');\n    } else if (ch === '\\\\') { r += '\\\\\\\\';\n    } else if (ch === '(')  { r += '\\\\(';\n    } else if (ch === ')')  { r += '\\\\)';\n    } else {\n      const c = ch.charCodeAt(0);\n      r += (c >= 32 && c <= 126) ? ch : '?';\n    }\n  }\n  return r;\n}\n\nfunction wrap(text, max) {\n  const words = String(text).split(' ');\n  const lines = []; let cur = '';\n  for (const w of words) {\n    const t = cur ? cur + ' ' + w : w;\n    if (t.length > max && cur) { lines.push(cur); cur = w; }\n    else cur = t;\n  }\n  if (cur) lines.push(cur);\n  return lines.length ? lines : [''];\n}\n\nconst PW=595.28, PH=841.89, ML=70.8, MR=524.4, FS=11, LH=16, LSM=14, MAX=80;\nconst ops = []; let y = 800;\n\nfunction T(x,yy,str,font,size) {\n  const s = escPdf(str);\n  if(s) ops.push(`BT /${font} ${size} Tf ${x.toFixed(1)} ${yy.toFixed(1)} Td (${s}) Tj ET`);\n}\nfunction TR(str,yy,font,size) {\n  T(MR - str.length*size*0.52, yy, str, font, size);\n}\n\nT(ML,y,'<APPLICANT_NAME>','FB',FS); y-=LSM;\nT(ML,y,'<APPLICANT_ADDRESS>','F',FS); y-=LSM;\nT(ML,y,'Mobil: <APPLICANT_PHONE>  E-Mail: <YOUR_EMAIL>','F',FS); y-=22;\n\nconst topY=y;\nfor(const l of [data.company_name,data.hiring_manager,data.company_address,data.location].filter(Boolean)){\n  T(ML,y,l,'F',FS); y-=LSM;\n}\nTR('Ulm, den '+data.date_applied, topY,'F',FS); y-=14;\n\nfor(const l of wrap('Bewerbung als '+data.job_title, MAX)){ T(ML,y,l,'FB',FS); y-=LH; }\ny-=8;\n\nfor(const para of data.cover_letter.split(/\\n\\n+/)){\n  if(y<80) break;\n  for(const line of para.trim().split('\\n')){\n    if(y<80) break;\n    if(!line.trim()){y-=6;continue;}\n    for(const wl of wrap(line,MAX)){ if(y<80)break; T(ML,y,wl,'F',FS); y-=LH; }\n  }\n  y-=6;\n}\n\nif(y>80){\n  y-=4;\n  T(ML,y,'Anlagen:','F',FS); y-=LH;\n  T(ML,y,'Lebenslauf','F',FS); y-=LH;\n  T(ML,y,'Zeugnisse','F',FS);\n}\n\nconst stream = ops.join('\\n');\nconst fontDict = '/F << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> '\n               + '/FB << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';\nconst res = `<< /Font << ${fontDict} >> >>`;\n\nfunction toBytes(s) {\n  const a = new Uint8Array(s.length);\n  for(let i=0;i<s.length;i++) a[i]=s.charCodeAt(i)&0xff;\n  return a;\n}\n\nconst parts = [];\nlet offset = 0;\nconst off = {};\n\nfunction addObj(id, content) {\n  const b = toBytes(content);\n  off[id] = offset;\n  parts.push(b);\n  offset += b.length;\n}\n\nconst hdrBytes = toBytes('%PDF-1.4\\n');\nparts.push(hdrBytes); offset += hdrBytes.length;\n\naddObj(1,'1 0 obj\\n<< /Type /Catalog /Pages 2 0 R >>\\nendobj\\n');\naddObj(2,'2 0 obj\\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\\nendobj\\n');\naddObj(3,`3 0 obj\\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PW} ${PH}] /Contents 4 0 R /Resources ${res} >>\\nendobj\\n`);\naddObj(4,`4 0 obj\\n<< /Length ${stream.length} >>\\nstream\\n${stream}\\nendstream\\nendobj\\n`);\n\nconst xrefPos = offset;\nlet xref = 'xref\\n0 5\\n0000000000 65535 f \\n';\nfor(let i=1;i<=4;i++) xref += String(off[i]).padStart(10,'0')+' 00000 n \\n';\nxref += `trailer\\n<< /Size 5 /Root 1 0 R >>\\nstartxref\\n${xrefPos}\\n%%EOF`;\nparts.push(toBytes(xref));\n\nconst total = parts.reduce((s,p)=>s+p.length,0);\nconst allBytes = new Uint8Array(total);\nlet pos=0;\nfor(const p of parts){allBytes.set(p,pos);pos+=p.length;}\n\nconst B64='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';\nlet b64='';\nfor(let i=0;i<allBytes.length;i+=3){\n  const b0=allBytes[i],b1=allBytes[i+1]||0,b2=allBytes[i+2]||0;\n  b64+=B64[b0>>2];\n  b64+=B64[((b0&3)<<4)|(b1>>4)];\n  b64+=i+1<allBytes.length?B64[((b1&15)<<2)|(b2>>6)]:'=';\n  b64+=i+2<allBytes.length?B64[b2&63]:'=';\n}\n\nconst fname='Anschreiben_'+data.job_title.replace(/[\\s\\/\\\\:*?\"<>|]/g,'_').substring(0,60)+'.pdf';\n\nreturn [{\n  json: { ...data, anschreiben_filename: fname },\n  binary: {\n    anschreiben: {\n      data: b64,\n      mimeType: 'application/pdf',\n      fileName: fname,\n      fileExtension: 'pdf'\n    }\n  }\n}];\n"
+      },
+      "id": "321c4364-735a-4ee2-bd1b-bd5eac0bf512",
+      "name": "Generate Anschreiben PDF",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2464,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "anschreiben",
+        "name": "={{ $json.anschreiben_filename }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "=<REPLACE_WITH_DRIVE_FOLDER_ID>",
+          "mode": "list",
+          "cachedResultName": "Bewerbung"
+        },
+        "options": {}
+      },
+      "id": "221bd471-d182-450e-b025-83a5ab546665",
+      "name": "Upload Anschreiben to Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2688,
+        96
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "dfyg9C5cdeBHmFkw",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "=<REPLACE_WITH_FILE_ID>",
+          "mode": "list",
+          "cachedResultName": "Lebenslauf.pdf"
+        },
+        "options": {
+          "binaryPropertyName": "lebenslauf",
+          "fileName": "Lebenslauf.pdf"
+        }
+      },
+      "id": "6230558f-0701-455b-ad7a-db2068bbdfa9",
+      "name": "Get Lebenslauf",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2912,
+        96
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "dfyg9C5cdeBHmFkw",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "=<REPLACE_WITH_FILE_ID>",
+          "mode": "list",
+          "cachedResultName": "Zeugnisse.pdf"
+        },
+        "options": {
+          "binaryPropertyName": "diplom",
+          "fileName": "Zeugnisse"
+        }
+      },
+      "id": "e0af4421-adad-4190-8ed9-105446db0870",
+      "name": "Get Master Diplom",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3136,
+        96
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "dfyg9C5cdeBHmFkw",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Upload Anschreiben to Drive').first().json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "anschreiben",
+          "fileName": "={{ $('Generate Anschreiben PDF').first().json.anschreiben_filename }}"
+        }
+      },
+      "id": "1c728570-7c3a-4a00-9128-2af5e1b7e283",
+      "name": "Get Anschreiben",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3360,
+        96
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "dfyg9C5cdeBHmFkw",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $('Prepare Email & Summary').item.json.job_title }}",
+        "message": "={{ $('Prepare Email & Summary').first().json.email_body }}",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "lebenslauf"
+              },
+              {
+                "property": "diplom"
+              },
+              {
+                "property": "anschreiben"
+              }
+            ]
+          },
+          "sendTo": "={{ $('Prepare Email & Summary').first().json.to_email }}"
+        }
+      },
+      "id": "3c26bc48-1a09-4678-8fc7-1abc77de5247",
+      "name": "Create Gmail Draft",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3584,
+        96
+      ],
+      "webhookId": "ffbbfd91-a85f-403d-9cf3-1efca4ffef4d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PTaiGiu5HubAptTK",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "=<REPLACE_WITH_SHEET_ID>",
+          "mode": "list",
+          "cachedResultName": "Bewerbung_sended"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Bewerbungen",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19BsjNPRiE0rNDaLdupKY5bm4A_pCxdb4f6r-iA_22AY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Prepare Email & Summary').item.json.job_title }} {{ $('Prepare Email & Summary').item.json.company_name }}",
+            "Date": "={{ $('Prepare Email & Summary').item.json.date_applied }}",
+            "Link": "={{ $('Prepare Email & Summary').item.json.job_url }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Link",
+              "displayName": "Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Client Name",
+              "displayName": "Client Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Telegram ID",
+              "displayName": "Telegram ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Client Email",
+              "displayName": "Client Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e67528e9-a1d5-4340-8267-8fbdc01f6d7b",
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        3808,
+        96
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "dzBa8kHB5yUUuXkR",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Prepare Email & Summary').first().json.chat_id }}",
+        "text": "=✅ *Anschreiben fertig & Entwurf erstellt!*\n\n🏢 *Unternehmen:* {{ $('Prepare Email & Summary').first().json.company_name }}\n💼 *Stelle:* {{ $('Prepare Email & Summary').first().json.job_title }}\n📍 *Ort:* {{ $('Prepare Email & Summary').first().json.location }}\n📧 *Kontakt:* {{ $('Prepare Email & Summary').first().json.to_email || 'nicht gefunden' }}\n\n📊 In Google Sheets eingetragen. Viel Erfolg! 🍀",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "fa0cbb53-b549-4a37-b54d-1bdfccb8eb46",
+      "name": "Send Success Summary to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4032,
+        96
+      ],
+      "webhookId": "1719516a-230a-46da-9bce-00634717ef4e",
+      "credentials": {
+        "telegramApi": {
+          "id": "h5qQ884sXj854jSv",
+          "name": "Bewerbung"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Telegram Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Telegram Message": {
+      "main": [
+        [
+          {
+            "node": "Is /apply command?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is /apply command?": {
+      "main": [
+        [
+          {
+            "node": "Route by URL Type",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unknown Command Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by URL Type": {
+      "main": [
+        [
+          {
+            "node": "Send Processing Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Normalize Job Text Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Processing Message": {
+      "main": [
+        [
+          {
+            "node": "Fetch Job Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Job Page": {
+      "main": [
+        [
+          {
+            "node": "Analyze Job Posting (OpenAI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Job Posting (OpenAI)": {
+      "main": [
+        [
+          {
+            "node": "Parse & Enrich Job Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse & Enrich Job Data": {
+      "main": [
+        [
+          {
+            "node": "Merge Job Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Job Data": {
+      "main": [
+        [
+          {
+            "node": "Generate Cover Letter (OpenAI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Job Text Input": {
+      "main": [
+        [
+          {
+            "node": "Analyze Job Text (OpenAI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Job Text (OpenAI)": {
+      "main": [
+        [
+          {
+            "node": "Parse & Enrich Job Data (Text)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse & Enrich Job Data (Text)": {
+      "main": [
+        [
+          {
+            "node": "Merge Job Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Generate Cover Letter (OpenAI)": {
+      "main": [
+        [
+          {
+            "node": "Prepare Email & Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Email & Summary": {
+      "main": [
+        [
+          {
+            "node": "Generate Anschreiben PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Anschreiben PDF": {
+      "main": [
+        [
+          {
+            "node": "Upload Anschreiben to Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Anschreiben to Drive": {
+      "main": [
+        [
+          {
+            "node": "Get Lebenslauf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Lebenslauf": {
+      "main": [
+        [
+          {
+            "node": "Get Master Diplom",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Master Diplom": {
+      "main": [
+        [
+          {
+            "node": "Get Anschreiben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Anschreiben": {
+      "main": [
+        [
+          {
+            "node": "Create Gmail Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Gmail Draft": {
+      "main": [
+        [
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Send Success Summary to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "399527d2-d978-4575-bac4-8db4ab61b731",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "441aefafc6b6131d1aeb03988aaa60ee5573977bb3b4f20be289fef9a5c5abf8"
+  },
+  "id": "p644w3C2I05pf69f",
+  "tags": []
+}

@@ -1,0 +1,18 @@
+# Never commit secrets or raw exports
+.env
+.env.local
+*.env
+node_modules/
+
+# Raw n8n exports contain real API keys and personal data
+*raw*.json
+Bewerbung My (2).json
+Answer from vector v2.json
+
+# Screenshots may reveal open node panels
+Screenshot*
+*.png
+*.jpg
+
+tmp_*.py
+INTERVIEW_PREPARATION.md
