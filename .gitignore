@@ -9,10 +9,12 @@ node_modules/
 Bewerbung My (2).json
 Answer from vector v2.json
 
-# Screenshots may reveal open node panels
+# Screenshots may reveal open node panels — only curated docs images are allowed
 Screenshot*
 *.png
 *.jpg
+!docs/workflow-a-bewerbung-my.png
+!docs/workflow-b-answer-from-vector.png
 
 tmp_*.py
 INTERVIEW_PREPARATION.md

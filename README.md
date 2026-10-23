@@ -36,6 +36,10 @@ The project contains two independent workflows:
 1. **`Bewerbung My`** (active) — the application pipeline described below.
 2. **`Answer from vector v2`** (inactive) — an experimental RAG assistant: Telegram text/voice/image → transcription or OCR → AI agent with a Supabase vector store and Postgres chat memory, optionally replying with generated speech. It also contains a manual ingestion branch that loads a PDF into the vector database.
 
+Canvas view of the active pipeline (23 nodes):
+
+![Bewerbung My workflow](docs/workflow-a-bewerbung-my.png)
+
 ### Workflow A — `Bewerbung My` (23 nodes)
 ```mermaid
 flowchart LR
@@ -63,6 +67,10 @@ flowchart LR
   DRAFT --> SHEET[Log to Google Sheets]
   SHEET --> SUCCESS[Send Success Summary to Telegram]
 ```
+
+Canvas view of the experimental RAG assistant (25 nodes, inactive):
+
+![Answer from vector v2 workflow](docs/workflow-b-answer-from-vector.png)
 
 ### Workflow B — `Answer from vector v2` (25 nodes, inactive)
 
