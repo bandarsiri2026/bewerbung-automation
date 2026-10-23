@@ -30,6 +30,11 @@ All notable changes to this repository are recorded here.
 - `scripts/pdf_test.js` — runnable test harness for the PDF layout code.
 - `.github/workflows/validate.yml` — CI runs both checks on every push.
 
+**Documentation**
+- README §1 now quantifies the before/after (30–60 minutes manual vs seconds automated)
+  with a step-by-step table and the project's motivation.
+- `docs/linkedin-post.md` — ready-to-publish announcement of the project.
+
 ## v1.0.0 — initial public release (2026-10-23)
 
 - Sanitized export of the application workflow with all API keys, tokens and personal data removed.
