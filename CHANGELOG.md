@@ -17,12 +17,12 @@ All notable changes to this repository are recorded here.
   node (HTTP, OpenAI, Drive, Sheets, Gmail, Telegram) — 13 nodes.
 - **Dead code removed**: the unused `is_yes` / `is_no` flags from the message parser.
 
-**Workflow B — `Answer from vector v2`**
-- Retries enabled on the 7 active network nodes (OpenAI, Drive, Telegram).
+**Repository split**
+- `Answer from vector v2` was moved to its own repository, [answer-from-vector-v2](https://github.com/bandarsiri2026/answer-from-vector-v2), where the same hardening (retries on the 7 active network nodes) is applied.
 
 **New shared workflow**
 - `workflows/error-handler.sanitized.json`: Error Trigger → error summary → Telegram
-  alert. Attach it as the *Error Workflow* of both workflows (see `docs/setup.md`).
+  alert. Attach it as the *Error Workflow* of the main pipeline (see `docs/setup.md`).
 
 **Tooling**
 - `scripts/validate_workflows.py` — parses every export, scans for secret-like tokens,
@@ -32,6 +32,6 @@ All notable changes to this repository are recorded here.
 
 ## v1.0.0 — initial public release (2026-10-23)
 
-- Sanitized exports of both workflows with all API keys, tokens and personal data removed.
+- Sanitized export of the application workflow with all API keys, tokens and personal data removed.
 - README with architecture diagrams, node-by-node explanation and troubleshooting table.
 - `docs/setup.md`, `.env.example`, `.gitignore` (raw exports/screenshots excluded), MIT license.

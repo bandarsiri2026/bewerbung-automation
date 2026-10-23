@@ -1,6 +1,6 @@
 # Security Audit — n8n Workflow Export (pre-publication review)
 
-**Files audited:** `Bewerbung My (2).json` and its canvas screenshot. The companion RAG workflow (`Answer from vector v2`) was audited separately in [answer-from-vector-v2](https://github.com/bandarsiri2026/answer-from-vector-v2).
+**Files audited:** `Bewerbung My (2).json`, `Answer from vector v2.json` and the two canvas screenshots.
 **Method:** static inspection of the exported JSON only. No workflow was executed, no external service was contacted, and **the original files were not modified**. Secret values are described below but never reproduced in this report.
 
 ## 1. Executive summary
@@ -81,14 +81,23 @@ Both screenshots show only the canvas layout (node names and connections). No cr
 
 ## 3. Sanitized copy created
 
-A sanitized copy was created **without touching the original**: published here as `workflows/bewerbung-my.sanitized.json`. It:
+Sanitized copies were created **without touching the originals**: published here as `workflows/bewerbung-my.sanitized.json` and `workflows/answer-from-vector-v2.sanitized.json`. They:
 - replace the three plaintext OpenAI keys with `Bearer {{ $env.OPENAI_API_KEY }}`,
 - empty `pinData` (the original contained a real third-party Telegram message),
 - replace personal name/address/phone/e-mail literals with `<APPLICANT_NAME>`, `<APPLICANT_ADDRESS>`, `<APPLICANT_PHONE>`, `<YOUR_EMAIL>`, `<FALLBACK_EMAIL>`,
 - replace Google Sheets / Drive resource IDs with `=<REPLACE_WITH_SHEET_ID>`, `=<REPLACE_WITH_DRIVE_FOLDER_ID>`, `=<REPLACE_WITH_FILE_ID>` and drop the cached result URLs,
 - regenerate every `webhookId` so the published file carries no instance fingerprint.
 
-The file is valid JSON, keeps all 24 nodes and the original connection graph, and can be imported into n8n for testing after you attach your own credentials. Two minor residues remain by design: the city string `'Ulm, den '` in the PDF date line (change it to a config value if you want full neutrality) and generic file names such as `Lebenslauf.pdf`.
+Both files are valid JSON, keep the original connection graph (24 nodes in workflow A after hardening, 25 in workflow B) and can be imported into n8n for testing after you attach your own credentials. Two minor residues remain by design: the city string `'Ulm, den '` in the PDF date line (change it to a config value if you want full neutrality) and generic file names such as `Lebenslauf.pdf`.
+
+### Hardening applied after the audit
+
+- `retryOnFail` / `maxTries: 3` / `waitBetweenRetries: 2` on all network nodes.
+- New `workflows/error-handler.sanitized.json` (Error Trigger → summary → Telegram alert); attach it as each workflow's Error Workflow.
+- Applicant data centralised in one `Applicant Profile` node that reads environment variables instead of literals.
+- `scripts/validate_workflows.py` re-scans every published JSON for secret-like tokens and dangling connections; it runs in CI (`.github/workflows/validate.yml`).
+
+**Reminder:** the OpenAI key that appeared in the original export must be **rotated**, not merely removed from the file — a leaked credential stays leaked even after the text is deleted.
 
 ## 4. Pre-publication checklist
 

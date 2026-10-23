@@ -28,14 +28,18 @@ Applying to jobs in Germany is repetitive and error-prone: every posting has to 
 | Document assembly | Google Drive download of CV and certificates, re-download of the generated letter |
 | Human-in-the-loop output | Gmail **draft** is created — nothing is sent automatically |
 | Audit trail | Application logged to a Google Sheet; confirmation message on Telegram |
+| Multi-page PDF | the hand-written generator starts a new page when the bottom margin is reached (no silent truncation) |
+| Resilience | `retryOnFail` / `maxTries: 3` / `waitBetweenRetries: 2` on every network node + a separate Error Handler workflow that reports failures to Telegram |
+| Config-driven profile | applicant name, address, phone and e-mail come from one `Applicant Profile` node backed by environment variables |
 
 ## 3. Architecture overview
 
-This repository contains **two workflows** plus a shared error handler:
+This repository contains the application pipeline and its companion error handler.
 
 1. **`Bewerbung My`** (active, 24 nodes) — the application pipeline described below.
-2. **`Answer from vector v2`** (inactive, 25 nodes) — an experimental multimodal RAG assistant: Telegram text/voice/image → transcription or OCR → AI agent with a Supabase vector store and Postgres chat memory, optionally replying with generated speech. Three of its nodes are disabled by design.
-3. **`Workflow Error Handler`** (3 nodes) — Error Trigger → error summary → Telegram alert; attach it as the *Error Workflow* of the other two.
+2. **`Workflow Error Handler`** (3 nodes) — Error Trigger → error summary → Telegram alert; attach it as the *Error Workflow* of the main pipeline.
+
+The second workflow from the original project, an experimental multimodal RAG assistant (`Answer from vector v2`, 25 nodes), now lives in its own repository: [answer-from-vector-v2](https://github.com/bandarsiri2026/answer-from-vector-v2).
 
 Canvas view of the active pipeline (24 nodes):
 
@@ -45,6 +49,7 @@ Canvas view of the active pipeline (24 nodes):
 ```mermaid
 flowchart LR
   TG[Telegram Trigger] --> PARSE[Parse Telegram Message<br/>JS: keyword + URL + e-mail regex]
+  TG -.-> PROFILE[Applicant Profile<br/>name, address, phone, e-mail from env vars]
   PARSE --> ISAPPLY{Is /apply command?}
   ISAPPLY -- true --> ROUTE{Route by URL Type}
   ISAPPLY -- false --> UNKNOWN[Unknown Command Reply]
@@ -59,7 +64,9 @@ flowchart LR
   ENRICH2 --> MERGE
   MERGE --> COVER[Generate Cover Letter - OpenAI]
   COVER --> PREP[Prepare Email & Summary]
-  PREP --> PDF[Generate Anschreiben PDF<br/>PDF bytes built in JS]
+  PROFILE -.-> PREP
+  PREP --> PDF[Generate Anschreiben PDF<br/>PDF bytes built in JS, multi-page]
+  PROFILE -.-> PDF
   PDF --> DRIVE[Upload Anschreiben to Drive]
   DRIVE --> CV[Get Lebenslauf]
   CV --> DIPLOMA[Get Master Diplom]
@@ -67,31 +74,6 @@ flowchart LR
   ANSCHREIBEN --> DRAFT[Create Gmail Draft<br/>3 attachments]
   DRAFT --> SHEET[Log to Google Sheets]
   SHEET --> SUCCESS[Send Success Summary to Telegram]
-```
-
-Canvas view of the experimental RAG assistant (25 nodes, inactive):
-
-![Answer from vector v2 workflow](docs/workflow-b-answer-from-vector.png)
-
-### Workflow B — `Answer from vector v2` (25 nodes, inactive)
-
-```mermaid
-flowchart LR
-  T[Telegram Trigger<br/>download attachments] --> SW{Switch1: rules}
-  T -. node disabled .-> LOG[Append row in sheet]
-  SW -- rule 0: text exists --> AG[AI Agent1]
-  SW -- rule 1: voice mime audio/ogg --> GF[Get a file] --> TR[Transcribe a recording] --> AG
-  SW -- rule 2: photo exists --> OCR[Analyze image<br/>gpt-4o-mini] --> AG
-  AG --> IF{If: original message had voice?}
-  IF -- true --> GEN[Generate audio - TTS, opus] --> SENDA[Send an audio file]
-  IF -- false --> SENDT[Send a text message] -. node disabled .-> MAIL[Gmail Send a message]
-  DF[Download file<br/>personal_info.pdf] --> VS[Supabase Vector Store1 insert]
-  DL[Default Data Loader1] --> VS
-  EM[Embeddings OpenAI] --> VS
-  LM[OpenAI Chat Model gpt-4.1-mini] -. ai_languageModel .-> AG
-  MEM[Postgres Chat Memory] -. ai_memory .-> AG
-  VST[SearchFamilyInfo vector tool] -. ai_tool .-> AG
-  URT[GetUserRecord Supabase tool<br/>disabled] -. ai_tool .-> AG
 ```
 
 ### Error handler — `Workflow Error Handler` (3 nodes)
@@ -111,8 +93,6 @@ flowchart LR
 | E-mail | Gmail (draft creation with attachments) |
 | Documents/storage | Google Drive (upload/download), Google Sheets (logging) |
 | AI models | OpenAI GPT-4o (extraction and cover letter), GPT-4.1-mini (agent), GPT-4o-mini (image analysis), transcription + text-to-speech |
-| Vector database / RAG | Supabase vector store + OpenAI embeddings (workflow B) |
-| Conversational memory | Postgres chat memory keyed by Telegram chat ID (workflow B) |
 | External data source | Arbeitsagentur job search REST API (`rest.arbeitsagentur.de`) |
 | Custom code | Node.js Code nodes: regex parsing, JSON enrichment, PDF byte generation |
 
@@ -123,11 +103,14 @@ flowchart LR
    npm install -g n8n
    n8n start
    ```
-2. Open the n8n UI → **Workflows** → **Import from file** and select the sanitized JSON (`Bewerbung My (2).sanitized.json`).
-3. Do **not** import the raw export if it still contains secrets — use the sanitized version.
+2. Open the n8n UI → **Workflows** → **Import from file** and select:
+   - `workflows/bewerbung-my.sanitized.json` (main pipeline)
+   - `workflows/error-handler.sanitized.json` (shared error handler)
+3. Do **not** import the raw export if it still contains secrets — use the sanitized versions only.
 4. After import, open every node that shows a missing credential and attach your own credentials.
-5. Create the referenced Google Drive folder and Sheets, then update the IDs in the nodes to your own resources.
-6. Activate the workflow only after all credentials are configured.
+5. Create the referenced Google Drive folder and Sheets, then update the placeholder IDs in the nodes to your own resources.
+6. In each workflow's **Settings → Error Workflow**, select the imported error handler so failures are reported on Telegram.
+7. Activate the workflow only after all credentials are configured.
 
 ## 6. Configuration requirements
 
@@ -138,7 +121,6 @@ flowchart LR
 | Google OAuth (Drive) | upload/download documents | folder must exist and be writable |
 | Gmail OAuth | draft creation | drafts are created, not sent |
 | OpenAI API key | three HTTP nodes / agent nodes | store as credential or `OPENAI_API_KEY` env var |
-| Supabase + Postgres credentials | vector store, chat memory, tool (workflow B) | required only for the RAG workflow |
 | Applicant profile data | `Applicant Profile` node and PDF header | name, address, phone, e-mail read from env vars |
 
 Recommended environment variables (self-hosted n8n):
@@ -193,7 +175,7 @@ Common failure modes observed from the configuration:
 | Workflow does nothing on a message | Switch/If rules do not match (e.g. a PDF attachment) | add a fallback rule |
 | Attachment missing in the draft | Drive file ID changed or permission error | verify IDs and OAuth scope |
 
-Recommended improvements: enable `retryOnFail` on HTTP nodes, add an Error Trigger workflow that notifies Telegram, and validate extracted data before generating documents.
+Remaining improvement: validate extracted job data before generating documents (see §11) and add a fallback branch for unsupported message types such as PDF attachments or stickers.
 
 ## 10. Security considerations
 
@@ -243,10 +225,14 @@ bewerbung-automation/
 ├── SECURITY_AUDIT.md             (pre-publication security review of the export)
 ├── PROJECT_ANALYSIS_AR.md        (detailed Arabic technical analysis, node by node)
 ├── workflows/
-│   ├── bewerbung-my.sanitized.json      (main pipeline, 24 nodes)
-│   └── error-handler.sanitized.json     (Error Trigger → Telegram notification)
+│   ├── bewerbung-my.sanitized.json          (main pipeline, 24 nodes)
+│   ├── answer-from-vector-v2.sanitized.json (experimental RAG assistant, 25 nodes)
+│   └── error-handler.sanitized.json         (Error Trigger → Telegram notification)
 ├── scripts/
-│   └── pdf_test.js                      (standalone test for the PDF generator)
+│   ├── pdf_test.js                          (standalone test for the PDF generator)
+│   └── validate_workflows.py                (secret + connection sanity check, used by CI)
+├── .github/workflows/validate.yml           (CI: runs both checks on every push)
+├── CHANGELOG.md
 ├── docs/
 │   ├── workflow-a-bewerbung-my.png
 │   ├── sample-anschreiben.pdf           (generated by scripts/pdf_test.js, placeholders only)
@@ -256,7 +242,7 @@ bewerbung-automation/
 └── LICENSE
 ```
 
-The companion RAG assistant lives in [answer-from-vector-v2](https://github.com/bandarsiri2026/answer-from-vector-v2).
+The RAG assistant is **not part of this repository** — see [answer-from-vector-v2](https://github.com/bandarsiri2026/answer-from-vector-v2) for that workflow, its setup guide and its security audit.
 
 `.gitignore` minimum content:
 ```text
